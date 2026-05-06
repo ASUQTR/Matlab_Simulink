@@ -35,7 +35,7 @@ $$
 \delta\dot{x} = A\,\delta x + B\,\delta u,
 $$
 
-avec \\(A=\left.\dfrac{\partial f}{\partial x}\right\|_{(x_0,u_0)}\\) et \\(B=\left.\dfrac{\partial f}{\partial u}\right\|_{(x_0,u_0)}\\).
+avec \\(A=\left.\dfrac{\partial f}{\partial x}\right|_{(x_0,u_0)}\\) et \\(B=\left.\dfrac{\partial f}{\partial u}\right|_{(x_0,u_0)}\\).
 
 ---
 
