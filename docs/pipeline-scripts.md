@@ -115,11 +115,15 @@ affectant uniquement les lignes 7 à 12 de l'état.
 
 ### 8. Calcul des jacobiennes
 
-$$A(x_0,u_0) = \left.\frac{\partial\,\text{state\_dot}}{\partial x}\right\|_{(x_0,u_0)},$$
+$$
+A(x_0,u_0) = \left.\frac{\partial\,\mathrm{state\_dot}}{\partial x}\right|_{(x_0,u_0)}
+$$
 
 calculée par `df_dstate = jacobian(state_dot, state)`.
 
-$$B(x_0,u_0) = \left.\frac{\partial\,\text{state\_dot}}{\partial u}\right\|_{(x_0,u_0)},$$
+$$
+B(x_0,u_0) = \left.\frac{\partial\,\mathrm{state\_dot}}{\partial u}\right|_{(x_0,u_0)}
+$$
 
 calculée par `jacobian(state_dot, transpose(du))`.
 
