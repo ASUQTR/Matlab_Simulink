@@ -35,7 +35,12 @@ $$
 \delta\dot{x} = A\,\delta x + B\,\delta u,
 $$
 
-avec \\(A=\left.\dfrac{\partial f}{\partial x}\right|_{(x_0,u_0)}\\) et \\(B=\left.\dfrac{\partial f}{\partial u}\right|_{(x_0,u_0)}\\).
+où les matrices jacobiennes sont
+
+$$
+A = \left.\dfrac{\partial f}{\partial x}\right|_{(x_0,u_0)}, \quad 
+B = \left.\dfrac{\partial f}{\partial u}\right|_{(x_0,u_0)}.
+$$
 
 ---
 
