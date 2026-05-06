@@ -1,0 +1,13 @@
+theme: minima
+title: "Modélisation du contrôle du mini-sous-marin"
+description: "Documentation du pipeline MATLAB/Simulink — modèle d'état, LQR, scripts"
+baseurl: "/Matlab_Simulink"
+url: "https://asuqtr.github.io"
+
+markdown: kramdown
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
+
+plugins:
+  - jekyll-relative-links
