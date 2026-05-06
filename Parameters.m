@@ -10,6 +10,7 @@
     %Amatrix = zeros(12,12);
     %Bmatrix = zeros(12,8);
     %X0 = 0;
+    % salut
 close all
 %% ------------------------------ Parameters ------------------------------
 %rg_b = [0 0 0.02 ]; [m]  % location of the CG (center of gravity) with respect to CO (') (0, 0,0)
