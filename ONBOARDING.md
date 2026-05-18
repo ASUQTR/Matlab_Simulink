@@ -4,6 +4,8 @@ Ce guide permet a une personne qui ne connait ni MATLAB Project ni Simulink de l
 
 Reference structure: `PROJECT_MAP.md`.
 
+Utilitaires one-shot: `tools/README.md`.
+
 ## Carte rapide des dependances
 
 ```mermaid
@@ -32,6 +34,8 @@ flowchart LR
 2. Ouvrir le dossier du depot: `C:/Programmation/ASUQTR/Matlab_Simulink`.
 3. Ouvrir le projet `.prj` si MATLAB le propose (`ASUQTR_Control.prj`).
 
+Important: pour une simulation normale, lancez `projectStartup` puis `runWorkflow`. N'utilisez `startup.m` que si vous ouvrez MATLAB sans le projet et que le dossier du depot est deja dans le path.
+
 ## 2) Verifier la configuration de base
 
 - Le chemin MATLAB doit inclure au minimum:
@@ -49,10 +53,11 @@ opts = struct( ...
     'stopTime', 10, ...
     'runParameters', true, ...
     'runGraphique', true, ...
-    'runMouvement', true, ...
+    'runMouvement', false, ...
     'runStability', true, ...
     'reportInstability', true, ...
     'saveFigures', true, ...
+    'simulationLabel', 'test_carre_2m', ...
     'figureOutputDir', fullfile('docs','figures'));
 
 simOut = runWorkflow(opts);
@@ -62,8 +67,19 @@ simOut = runWorkflow(opts);
 
 - Graphiques de position/commande: `scripts/analysis/Graphique.m`
 - Animation trajectoire: `scripts/analysis/mouvement.m`
+
+Si vous voulez l'animation 3D, relancez avec `runMouvement = true`.
 - Stabilite poles: `scripts/analysis/instabiliter_graphique.m`
 - Resume instabilites: `scripts/analysis/report_instabilities.m`
+
+Note: les fichiers `.fig` permettent de rouvrir/modifier les graphes dans MATLAB. Pour reutiliser les donnees brutes de simulation, gardez aussi `simOut` (retour de `runWorkflow`) ou exportez-le en `.mat`.
+
+Le workflow enregistre automatiquement:
+
+- `data/runtime/info_simulation.mat` : derniere simulation, compatible avec les scripts existants
+- `data/runtime/history/info_simulation_YYYYMMDD_HHMMSS[_label].mat` : historique horodate des simulations
+
+Astuce: utilisez `simulationLabel` pour distinguer les scenarios (`carre`, `pentagone`, `ligne`, `cercle`, etc.).
 
 ## 5) Si une erreur apparait
 
@@ -78,6 +94,8 @@ simOut = runWorkflow(opts);
 - `data/README.md`
 - `docs/README.md`
 - `archive/README.md`
+
+Si vous cherchez a savoir "quel fichier fait quoi", consultez `PROJECT_MAP.md`. C'est la source de reference pour les entrees du projet et l'ordre d'execution.
 
 ## 7) Mini glossaire (debutant)
 

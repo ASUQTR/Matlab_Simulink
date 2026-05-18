@@ -19,6 +19,16 @@ Racine minimale recommandee:
 
 Tout le reste a la racine est considere comme bruit (cache/artefact) et doit etre deplace ou ignore.
 
+## 1.1) Quel fichier sert a quoi
+
+| Fichier | Quand l'utiliser | Role |
+|---|---|---|
+| `projectStartup.m` | A chaque ouverture du projet ou avant `runWorkflow` | Initialise les chemins, le cache et les verifications de base |
+| `runWorkflow.m` | A chaque nouvelle simulation | Lance la simulation puis les figures, exports et rapports |
+| `startup.m` | Seulement si le dossier est ajoute au MATLAB path hors projet | Fallback automatique qui appelle `projectStartup.m` |
+| `tools/create_matlab_project.m` | Une seule fois, pour creation/initialisation du projet | Aide a creer le `.prj` quand l'API MATLAB est disponible |
+| `ASUQTR_Control.prj` | A l'ouverture du projet | Enregistre la configuration projet MATLAB |
+
 ## 2) Actif vs Archive
 
 ### Actif (utilise par le pipeline courant)
@@ -50,11 +60,13 @@ projectStartup
 simOut = runWorkflow(struct( ...
     'runParameters', true, ...
     'runGraphique', true, ...
-    'runMouvement', true, ...
+    'runMouvement', false, ...
     'runStability', true, ...
     'reportInstability', true, ...
     'saveFigures', true));
 ```
+
+Regle pratique: pour une nouvelle simulation courante, on utilise `runWorkflow`. `projectStartup` sert a preparer l'environnement; `startup.m` ne sert que comme secours hors projet.
 
 ## Mode pas-a-pas (debug)
 

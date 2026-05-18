@@ -7,9 +7,9 @@ sensors = out.sensors.signals.values;
 % plot3(x, y, z)
 SubFilePath = fullfile(matlabroot, 'toolbox', 'shared', 'robotics', 'robotcore', 'meshes');
 
-for ii = 1 : 50 : length(Position)
-    ii = ii+2*ii;
-     X_Y_Z = [Position(ii,1) Position(ii,2) Position(ii,3)];
+sampleCount = size(Position, 1);
+for ii = 1:50:sampleCount
+    X_Y_Z = [Position(ii,1) Position(ii,2) Position(ii,3)];
  %   X_Y_Z = [Position(ii,1) Position(ii,2) sensors(ii,10)];
     Phi_Theta_psi = [Position(ii,4) Position(ii,5) Position(ii,6)];
     q_Phi_Theta_psi = eul2quat(Phi_Theta_psi);
