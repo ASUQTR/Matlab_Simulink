@@ -1,5 +1,5 @@
 theme: minima
-title: "Modélisation du contrôle du mini-sous-marin"
+title: "Modélisation du contrôle du Sous-marin ASUQTR"
 description: "Documentation du pipeline MATLAB/Simulink — modèle d'état, LQR, scripts"
 baseurl: "/Matlab_Simulink"
 url: "https://asuqtr.github.io"

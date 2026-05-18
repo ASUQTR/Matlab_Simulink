@@ -8,9 +8,11 @@ sim_cache/
 codegen/
 *~
 
-# MATLAB generated data (keep committed outputs if desired; adjust as team prefers)
-/data/generated/
+# MATLAB generated data (keep the folder, ignore recalculable contents)
+/data/generated/*
+!/data/generated/.gitkeep
 
-# Ignore user/project-specific MATLAB files (optional)
+# Ignore user/project-specific MATLAB files, but keep the shared project file.
 *.prj
+!ASUQTR_Control.prj
 preferences.m

@@ -1,4 +1,4 @@
-%% PROGRAMME DE CALCUL LQR - MINI SOUS-MARIN
+%% PROGRAMME DE CALCUL LQR - SOUS-MARIN ASUQTR
 clear all; clc; close all;
 projectRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 generatedDataDir = fullfile(projectRoot, 'data', 'generated');

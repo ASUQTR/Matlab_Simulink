@@ -1,11 +1,11 @@
 ---
 layout: default
-title: "Documentation — Mini-sous-marin MATLAB/Simulink"
+title: "Documentation — Sous-marin ASUQTR MATLAB/Simulink"
 ---
 
 # Modélisation du contrôle du sous-marin
 
-Ce site rassemble la documentation complète du pipeline MATLAB/Simulink utilisé pour modéliser, contrôler et valider le mini-sous-marin AUV développé à l'ASUQTR.
+Ce site rassemble la documentation complète du pipeline MATLAB/Simulink utilisé pour modéliser, contrôler et valider le Sous-marin ASUQTR AUV.
 
 > **Code source** : [ASUQTR/Matlab\_Simulink](https://github.com/ASUQTR/Matlab_Simulink)
 

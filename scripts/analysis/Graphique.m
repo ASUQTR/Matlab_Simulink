@@ -86,19 +86,26 @@ ylim([-1 1]);
 
 figure(5)
 motorNames = {'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8'};
-motorGroups = {[1 2], [3 4], [5 6], [7 8]};
+motorLimits = [min(thrust(:)), max(thrust(:))];
+if motorLimits(1) == motorLimits(2)
+    motorLimits = motorLimits + [-1 1];
+end
 
-tiledlayout(2, 2, 'Padding', 'compact', 'TileSpacing', 'compact')
-for groupIndex = 1:numel(motorGroups)
+set(gcf, 'Name', 'Commandes des moteurs', 'NumberTitle', 'off')
+layout = tiledlayout(4, 2, 'Padding', 'compact', 'TileSpacing', 'compact');
+title(layout, 'Commandes individuelles des moteurs')
+
+for motorIndex = 1:numel(motorNames)
     nexttile
-    motorIndices = motorGroups{groupIndex};
-    plot(time, thrust(:, motorIndices(1)), 'LineWidth', 1.0)
-    hold on
-    plot(time, thrust(:, motorIndices(2)), 'LineWidth', 1.0)
-    hold off
+    plot(time, thrust(:, motorIndex), 'LineWidth', 1.1)
+    yline(0, 'k:')
     grid on
-    title(sprintf('Moteurs %s / %s', motorNames{motorIndices(1)}, motorNames{motorIndices(2)}))
-    ylabel('Puissance (N)')
-    xlabel('Temps (s)')
-    legend(motorNames(motorIndices), 'Location', 'best')
+    title(sprintf('Moteur %s', motorNames{motorIndex}))
+    ylim(motorLimits)
+    if motorIndex > 6
+        xlabel('Temps (s)')
+    end
+    if mod(motorIndex, 2) == 1
+        ylabel('Force (N)')
+    end
 end
