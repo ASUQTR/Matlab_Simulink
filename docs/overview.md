@@ -5,7 +5,7 @@ title: "Vue d'ensemble"
 
 # Vue d'ensemble
 
-Ce dépôt rassemble le modèle mathématique, la génération des matrices d'état, le calcul du retour LQR et les scripts de validation/visualisation utilisés autour des modèles Simulink du mini-sous-marin AUV.
+Ce dépôt rassemble le modèle mathématique, la génération des matrices d'état, le calcul du retour LQR et les scripts de validation/visualisation utilisés autour des modèles Simulink du sous-marin AUV.
 
 Le contenu des fichiers `.slx` (modèles Simulink) n'est pas détaillé ici ; cette documentation se concentre sur le pipeline MATLAB qui alimente la simulation et l'analyse.
 
