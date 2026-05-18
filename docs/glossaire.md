@@ -3,7 +3,7 @@ layout: default
 title: "Glossaire"
 ---
 
-# Glossaire MATLAB/Simulink (mini-sous-marin)
+# Glossaire MATLAB/Simulink (sous-marin)
 
 Ce glossaire est destine aux personnes qui decouvrent le projet.
 
