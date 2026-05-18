@@ -37,7 +37,7 @@ if (carrer == 1)
     plot(2,2,'r*')
     plot(0,2,'r*')
     hold off
-    title('Réponse au déplacement 2m x 2m en XY')
+    title('R�ponse au d�placement 2m x 2m en XY')
     xlabel('Position du sous-marin en X')
     ylabel('Position du sous-marin en Y')
     grid on
@@ -48,7 +48,7 @@ elseif (pentagone == 1)
     plot(1.000 , 3.078,'r*')
     plot(-0.618, 1.902,'r*')
     hold off
-    title('Réponse au déplacement d un pentagone en XY')
+    title('R�ponse au d�placement d un pentagone en XY')
     xlabel('Position du sous-marin en X')
     ylabel('Position du sous-marin en Y')
     grid on
@@ -56,7 +56,7 @@ elseif (ligne == 1)
     plot(0,0,'r*')
     plot(2,0,'r*')
     hold off
-    title('Réponse au déplacement d une ligne en x')
+    title('R�ponse au d�placement d une ligne en x')
     xlabel('Position du sous-marin en X')
     ylabel('Position du sous-marin en Y')
     % ylim([-1 1]);
@@ -66,7 +66,7 @@ elseif (cercle == 1)
     plot(2,-2,'r*')
     plot(-2,-2,'r*')
     hold off
-    title('Réponse au déplacement d un cercle en XY')
+    title('R�ponse au d�placement d un cercle en XY')
     xlabel('Position du sous-marin en X')
     ylabel('Position du sous-marin en Y')
     ylim([-4.5 0.5]);
@@ -76,38 +76,42 @@ end
 
 
 plot3(x, y, z)
-zlim([-0.1 0.1])
+zlim([-1 1])
 
 figure(2)
 hold on
 plot(time,x)
 hold off
-title('Réponse au déplacement 2m x 2m en XY')
+title('R�ponse au d�placement 2m x 2m en XY')
 ylabel('Position en X')
 xlabel('Temps (s)')
 
 grid on
 figure(3)
+hold on
 plot(time,y)
-title('Réponse au déplacement 2m x 2m en XY')
+hold off
+title('R�ponse au d�placement 2m x 2m en XY')
 ylabel('Position en Y')
 xlabel('Temps (s)')
 
-figure(3)
+figure(4)
+hold on
 plot(time,z)
-title('Réponse au déplacement 2m x 2m en XY')
+hold off
+title('R�ponse au d�placement 2m x 2m en XY')
 ylabel('Position en Z')
 xlabel('Temps (s)')
 ylim([-1 1]);
 
 % figure(4)
 % plot(time,z)
-% title('Réponse au déplacement 2m x 2m en 40 secondes')
+% title('R�ponse au d�placement 2m x 2m en 40 secondes')
 % ylabel('Position en Z')
 % xlabel('Temps (s)')
 % figure(5)
 % plot(time,thrust)
-% title('Réponse au déplacement 2m x 2m en 40 secondes')
+% title('R�ponse au d�placement 2m x 2m en 40 secondes')
 % ylabel('Puissance des moteurs en Newton')
 % xlabel('Temps (s)')
 

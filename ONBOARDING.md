@@ -2,6 +2,8 @@
 
 Ce guide permet a une personne qui ne connait ni MATLAB Project ni Simulink de lancer le pipeline en 15-20 minutes.
 
+Reference structure: `PROJECT_MAP.md`.
+
 ## Carte rapide des dependances
 
 ```mermaid

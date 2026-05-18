@@ -4,6 +4,7 @@
 *.slxc
 *.slxc.*
 slprj/
+sim_cache/
 codegen/
 *~
 

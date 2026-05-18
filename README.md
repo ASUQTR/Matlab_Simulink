@@ -8,6 +8,7 @@ Si vous arrivez sur le projet pour la premiere fois, commencez ici:
 
 - Guide pas-a-pas: [ONBOARDING.md](ONBOARDING.md)
 - Setup projet MATLAB: [PROJECT_SETUP.md](PROJECT_SETUP.md)
+- Cartographie du projet (actif vs archive): [PROJECT_MAP.md](PROJECT_MAP.md)
 - Pipeline one-shot: `runWorkflow.m`
 
 ### Documentation par dossier (structure actuelle)
