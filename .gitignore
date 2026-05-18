@@ -1,0 +1,15 @@
+# MATLAB / Simulink artifacts
+*.asv
+*.autosave
+*.slxc
+*.slxc.*
+slprj/
+codegen/
+*~
+
+# MATLAB generated data (keep committed outputs if desired; adjust as team prefers)
+/data/generated/
+
+# Ignore user/project-specific MATLAB files (optional)
+*.prj
+preferences.m
