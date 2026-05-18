@@ -1,4 +1,4 @@
-# Modélisation du contrôle du mini-sous-marin
+# Modélisation du contrôle du sous-marin
 
 Ce dépôt rassemble le modèle mathématique, la génération des matrices d'état, le calcul du retour LQR et les scripts de validation/visualisation utilisés autour des modèles Simulink du mini-sous-marin AUV développé à l'ASUQTR.
 
