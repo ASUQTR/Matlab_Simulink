@@ -157,7 +157,7 @@ syms x y z roll_ pitch_ yaw_ u v w p q r du0 du1 du2 du3 du4 du5 du6 du7 radius
 %Gravity matrix parameters
 % displaced_water_volume = 0.045;
 % displaced_water_volume = 0.01; 
-displaced_water_volume = 0.01;
+displaced_water_volume = 0.03;
 water_density = 1000.0;
 gx = 0;
 gy = 0;
