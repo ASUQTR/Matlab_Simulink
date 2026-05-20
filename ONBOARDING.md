@@ -1,110 +1,120 @@
 # Onboarding rapide (nouvel arrivant)
 
-Ce guide permet a une personne qui ne connait ni MATLAB Project ni Simulink de lancer le pipeline en 15-20 minutes.
+Ce guide permet de lancer le pipeline en moins de 10 minutes.
 
-Reference structure: `PROJECT_MAP.md`.
+Reference structure: `PROJECT_MAP.md` — Documentation complete: `docs/`
 
-Utilitaires one-shot: `tools/README.md`.
+---
 
-## Carte rapide des dependances
+## En 2 etapes
 
-```mermaid
-flowchart LR
-  PS[projectStartup.m] --> PRJ[MATLAB Project / Path]
-  PRJ --> RW[runWorkflow.m]
-  RW --> P[model/callbacks/Parameters.m]
-  RW --> SLX[model/Modele_LQR_6DOF.slx]
-
-  P --> DG[data/generated/*.mat]
-  P --> DF[data/formes/*.mat]
-
-  RW --> GA[scripts/analysis/Graphique.m]
-  RW --> MO[scripts/analysis/mouvement.m]
-  RW --> IG[scripts/analysis/instabiliter_graphique.m]
-  RW --> RI[scripts/analysis/report_instabilities.m]
-
-  GA --> FIG[docs/figures/]
-  MO --> FIG
-  IG --> FIG
 ```
+1. Ouvrir ASUQTR_Control.prj  →  MATLAB configure tout automatiquement
+2. runWorkflow()               →  simulation + figures
+```
+
+C'est tout. Le projet s'occupe des chemins MATLAB au demarrage via Task Automation.
+
+---
 
 ## 1) Ouvrir le projet
 
-1. Ouvrir MATLAB.
-2. Ouvrir le dossier du depot: `C:/Programmation/ASUQTR/Matlab_Simulink`.
-3. Ouvrir le projet `.prj` si MATLAB le propose (`ASUQTR_Control.prj`).
+Dans MATLAB : **Home → Open → `ASUQTR_Control.prj`**
 
-Important: pour une simulation normale, lancez `projectStartup` puis `runWorkflow`. N'utilisez `startup.m` que si vous ouvrez MATLAB sans le projet et que le dossier du depot est deja dans le path.
+MATLAB execute automatiquement `tools/projectStartup.m` a l'ouverture, ce qui :
+- ajoute `scripts/`, `data/formes/`, `data/generated/`, `tools/` au path
+- verifie que les fichiers requis sont presents
 
-## 2) Verifier la configuration de base
+> **Premiere fois sur cette machine ?** Verifier dans Project Settings → Task Automation que `tools/projectStartup.m` est bien dans "Startup files". Sinon l'ajouter manuellement (voir `docs/PROJECT_SETUP.md`).
 
-- Le chemin MATLAB doit inclure au minimum:
-  - `scripts/`
-  - `data/formes/`
-  - `data/generated/`
-- Le cache Simulink peut pointer vers:
-  - `sim_cache/`
-  - `codegen/`
+---
 
-## 3) Lancer un run complet (recommande)
+## 2) Lancer une simulation
 
 ```matlab
-opts = struct( ...
-    'stopTime', 10, ...
-    'runParameters', true, ...
-    'runGraphique', true, ...
-    'runMouvement', false, ...
-    'runStability', true, ...
-    'reportInstability', true, ...
-    'saveFigures', true, ...
-    'simulationLabel', 'test_carre_2m', ...
-    'figureOutputDir', fullfile('docs','figures'));
-
-simOut = runWorkflow(opts);
+simOut = runWorkflow();
 ```
 
-## 4) Lire les resultats
+**Deux types de configuration independants :**
 
-- Graphiques de position/commande: `scripts/analysis/Graphique.m`
-- Animation trajectoire: `scripts/analysis/mouvement.m`
+| Type | Fichier | Controle |
+|------|---------|---------|
+| Calibration physique | `scripts/config/params_*.m` | Masse, inertie, actionneurs — modifie dans `Parameters.m` |
+| Scenario de simulation | `scripts/config/scenario_*.m` | Duree, figures, exports — passe a `runWorkflow` |
 
-Si vous voulez l'animation 3D, relancez avec `runMouvement = true`.
-- Stabilite poles: `scripts/analysis/instabiliter_graphique.m`
-- Resume instabilites: `scripts/analysis/report_instabilities.m`
+Exemple — changer la duree et sauvegarder les figures :
 
-Note: les fichiers `.fig` permettent de rouvrir/modifier les graphes dans MATLAB. Pour reutiliser les donnees brutes de simulation, gardez aussi `simOut` (retour de `runWorkflow`) ou exportez-le en `.mat`.
+```matlab
+cfg = scenario_default();   % scripts/config/scenario_default.m
+cfg.stopTime    = 30;
+cfg.saveFigures = true;
+simOut = runWorkflow(cfg);
+```
 
-Le workflow enregistre automatiquement:
+Pour changer la calibration physique : modifier `model/callbacks/Parameters.m`,
+remplacer `params_nominal()` par la variante voulue.
 
-- `data/runtime/info_simulation.mat` : derniere simulation, compatible avec les scripts existants
-- `data/runtime/history/info_simulation_YYYYMMDD_HHMMSS[_label].mat` : historique horodate des simulations
+Voir `scripts/config/README.md` pour la liste complete et des exemples.
 
-Astuce: utilisez `simulationLabel` pour distinguer les scenarios (`carre`, `pentagone`, `ligne`, `cercle`, etc.).
+---
 
-## 5) Si une erreur apparait
+## 3) Lire les resultats
 
-- Verifier que `data/formes/sous marin en pentagone.mat` existe.
-- Verifier que les artefacts de `data/generated/` existent (`ABmatrice.mat`, `calcul_Q.mat`, `Matrice_A_lineaire.mat`).
-- Relancer `projectStartup.m`, puis `runWorkflow.m`.
+| Ce que tu veux voir | Script |
+|---------------------|--------|
+| Graphiques position/commande | `scripts/analysis/Graphique.m` |
+| Animation 3D trajectoire | relancer avec `cfg.runMouvement = true` |
+| Evolution des poles (stabilite) | `scripts/analysis/instabiliter_graphique.m` |
+| Resume instabilites | `scripts/analysis/report_instabilities.m` |
 
-## 6) Comprendre la structure
+Les sorties sont sauvegardees automatiquement :
+- `data/runtime/info_simulation.mat` — derniere simulation
+- `data/runtime/history/info_simulation_YYYYMMDD_HHMMSS.mat` — historique
 
-- `model/README.md`
-- `scripts/README.md`
-- `data/README.md`
-- `docs/README.md`
-- `archive/README.md`
+---
 
-Si vous cherchez a savoir "quel fichier fait quoi", consultez `PROJECT_MAP.md`. C'est la source de reference pour les entrees du projet et l'ordre d'execution.
+## 4) Si une erreur apparait
 
-## 7) Mini glossaire (debutant)
+- **"File not found"** : verifier que `data/formes/sous marin en pentagone.mat` existe.
+- **"Undefined function"** : le projet n'est peut-etre pas ouvert. Rouvrir `ASUQTR_Control.prj`.
+- **Artefacts manquants** : les fichiers `data/generated/*.mat` (ABmatrice, calcul_Q, etc.) sont recalculables — relancer les scripts dans `scripts/modeling/` dans l'ordre.
 
-- `A`, `B`: matrices d'etat lineairees (dynamique et entree commande).
-- `Q`, `R`: poids du regulateur LQR (compromis precision/effort de commande).
-- `K`: gain de retour d'etat calcule par LQR.
-- `out`: objet `Simulink.SimulationOutput` contenant les signaux de simulation.
-- `poles`: valeurs propres de la dynamique en boucle fermee; si partie reelle > 0, instabilite locale.
-- `data/generated`: artefacts calcules par les scripts (recalculables).
-- `data/formes`: jeux de trajectoires/scenarios utilises par le modele.
+---
 
-Glossaire complet: `docs/glossaire.md`.
+## 5) Structure en un coup d'oeil
+
+```
+ASUQTR_Control.prj   ← ouvrir ceci
+runWorkflow.m        ← lancer ceci
+model/               ← modele Simulink + parametres
+scripts/
+  modeling/          ← generation matrices A, B, Q, K
+  analysis/          ← graphiques, animation, stabilite
+  validation/        ← verification du reglage
+  config/            ← presets de simulation (scenario_default, etc.)
+data/
+  formes/            ← trajectoires/scenarios (requis)
+  generated/         ← artefacts recalculables (gitignore)
+  experiments/       ← variantes de tuning versionnees
+  runtime/           ← sorties de simulation (gitignore)
+tests/               ← tests formels (unit/, integration/)
+archive/
+  models/            ← anciens .slx
+  scripts/           ← anciens .m
+```
+
+Pour savoir "quel fichier fait quoi" : `PROJECT_MAP.md`.
+
+---
+
+## Mini glossaire
+
+| Terme | Definition |
+|-------|------------|
+| `A`, `B` | Matrices d'etat lineairees (dynamique et entree commande) |
+| `Q`, `R` | Poids du regulateur LQR (compromis precision / effort) |
+| `K` | Gain de retour d'etat calcule par LQR |
+| `out` | Objet `Simulink.SimulationOutput` contenant les signaux |
+| poles | Valeurs propres boucle fermee — partie reelle > 0 = instabilite |
+
+Glossaire complet : `docs/glossaire.md`

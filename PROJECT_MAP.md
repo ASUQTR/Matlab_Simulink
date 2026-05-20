@@ -8,14 +8,15 @@ Racine minimale recommandee:
 
 - `README.md` : entree principale
 - `ONBOARDING.md` : guide 1ere prise en main
-- `PROJECT_SETUP.md` : configuration projet MATLAB/Simulink
 - `PROJECT_MAP.md` : ce document (structure et roles)
 - `projectStartup.m` : initialisation path/projet
 - `runWorkflow.m` : execution one-shot simulation + analyses
 - `startup.m` : fallback MATLAB startup
 - `ASUQTR_Control.prj` : projet MATLAB partage
 - `.gitignore`, `.gitattributes`
-- Dossiers: `model/`, `scripts/`, `data/`, `docs/`, `archive/`, `resources/`
+- Dossiers: `model/`, `scripts/`, `data/`, `docs/`, `archive/`, `resources/`, `tests/`
+
+`PROJECT_SETUP.md` a ete deplace dans `docs/PROJECT_SETUP.md`.
 
 Tout le reste a la racine est considere comme bruit (cache/artefact) et doit etre deplace ou ignore.
 
@@ -23,11 +24,12 @@ Tout le reste a la racine est considere comme bruit (cache/artefact) et doit etr
 
 | Fichier | Quand l'utiliser | Role |
 |---|---|---|
-| `projectStartup.m` | A chaque ouverture du projet ou avant `runWorkflow` | Initialise les chemins, le cache et les verifications de base |
+| `ASUQTR_Control.prj` | A chaque session — **ouvrir ceci en premier** | Configure les chemins et lance `tools/projectStartup.m` via Task Automation |
 | `runWorkflow.m` | A chaque nouvelle simulation | Lance la simulation puis les figures, exports et rapports |
-| `startup.m` | Seulement si le dossier est ajoute au MATLAB path hors projet | Fallback automatique qui appelle `projectStartup.m` |
+| `tools/projectStartup.m` | Appele automatiquement par le projet a l'ouverture | Initialise les chemins et verifie les fichiers requis — ne pas appeler manuellement |
 | `tools/create_matlab_project.m` | Une seule fois, pour creation/initialisation du projet | Aide a creer le `.prj` quand l'API MATLAB est disponible |
-| `ASUQTR_Control.prj` | A l'ouverture du projet | Enregistre la configuration projet MATLAB |
+| `scripts/config/params_nominal.m` | Calibration active — changer dans `Parameters.m` | Parametres physiques du sous-marin (masse, inertie, actionneurs) |
+| `scripts/config/scenario_default.m` | Passe a `runWorkflow(cfg)` pour personaliser un run | Options de simulation : duree, figures, exports — sans lien avec la physique |
 
 ## 2) Actif vs Archive
 
@@ -38,16 +40,18 @@ Tout le reste a la racine est considere comme bruit (cache/artefact) et doit etr
 - Generation modeles/artefacts: `scripts/modeling/*.m`
 - Validation reglage: `scripts/validation/*.m`
 - Post-traitement: `scripts/analysis/*.m`
+- Presets de simulation: `scripts/config/scenario_default.m` (et variantes)
+- Tests formels: `tests/unit/`, `tests/integration/`
 - Donnees de simulation:
-  - `data/formes/` (scenarios)
-  - `data/runtime/` (sorties runtime)
-  - `data/generated/` (artefacts recalculables)
+  - `data/formes/` (scenarios/trajectoires)
+  - `data/runtime/` (sorties runtime — gitignore)
+  - `data/generated/` (artefacts recalculables — gitignore)
+  - `data/experiments/` (variantes de tuning versionnees)
 
 ### Archive (historique)
 
-- Variantes anciens modeles `.slx/.slxc`
-- Anciens scripts de test non utilises par le flux principal
-- Autosaves et essais historiques
+- `archive/models/` : variantes anciennes modeles `.slx` (3DOF, r2019b, r2020b)
+- `archive/scripts/` : anciens scripts de test non utilises par le flux principal
 
 Regle: si un fichier est requis pour executer `runWorkflow`, il n'est pas en archive.
 

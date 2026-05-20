@@ -1,20 +1,27 @@
 # Model Callbacks
 
-Ce dossier contient les scripts executes par le modele Simulink lors de l'ouverture ou du lancement.
+Scripts executes automatiquement par Simulink a l'ouverture du modele.
 
 ## Contenu
 
-- `Parameters.m` : initialise les parametres physiques, ajoute les chemins utiles et charge les matrices requises.
+- `Parameters.m` : charge la calibration physique active et exporte les variables au workspace Simulink.
 
-## Role
+## Ce que fait Parameters.m
 
-Le callback garantit qu'un utilisateur qui ouvre le modele sans preparation manuelle obtient un environnement coherent.
+1. Appelle la calibration active (ex: `params_nominal()` dans `scripts/config/`)
+2. Charge les matrices LQR depuis `data/generated/` (calcul_Q.mat, Matrice_A_lineaire.mat)
+3. Exporte toutes les variables au base workspace pour que les blocs Simulink y aient acces
+
+**Changer de calibration** : modifier la ligne `p = params_nominal()` dans `Parameters.m`.
+Les options disponibles sont dans `scripts/config/params_*.m`.
 
 ## Dependances
 
-- Lit des fichiers dans `data/generated/`.
-- Verifie les donnees de simulation dans `data/formes/`.
+- `scripts/config/params_*.m` — calibration physique active
+- `data/generated/calcul_Q.mat` — matrice Q du LQR
+- `data/generated/Matrice_A_lineaire.mat` — matrice A numerique
+- `data/formes/sous marin en pentagone.mat` — trajectoire de reference
 
 ## Regle
 
-Si vous ajoutez un nouveau fichier requis au demarrage du modele, documentez-le ici et dans `data/README.md`.
+Si vous ajoutez une nouvelle dependance au demarrage du modele, documentez-la ici et dans `data/README.md`.

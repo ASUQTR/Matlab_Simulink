@@ -10,6 +10,7 @@ Documentation utilisateur et technique du projet.
 - `glossaire.md` : definitions courtes pour nouveaux arrivants.
 - `theorie.md` : fondements mathematiques.
 - `testing.md` : procedure de test/smoke test.
+- `PROJECT_SETUP.md` : guide de creation/configuration du projet MATLAB (.prj).
 
 ## Figures
 

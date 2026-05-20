@@ -10,7 +10,7 @@ try
     if exist('matlab.project.createProject','file')
         p = matlab.project.createProject(pwd);
         % Try to set the startup script if present
-        startupFile = fullfile(p.RootFolder, 'projectStartup.m');
+        startupFile = fullfile(p.RootFolder, 'tools', 'projectStartup.m');
         if exist(startupFile,'file')
             try
                 p.Startup = startupFile;
@@ -19,7 +19,7 @@ try
                 warning('Project created but could not set Startup: %s', err.message);
             end
         else
-            fprintf('Project created at %s\nNote: projectStartup.m not found. Create or move it to the project root and set it as startup manually.\n', p.RootFolder);
+            fprintf('Project created at %s\nNote: tools/projectStartup.m not found. Add it manually via Project Settings > Task Automation.\n', p.RootFolder);
         end
     else
         error('MATLAB project API not available in this release. Create the project from the MATLAB GUI: Home → New → Project → From Folder...');

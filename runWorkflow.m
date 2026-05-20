@@ -26,7 +26,7 @@ if nargin < 1
     options = struct();
 end
 
-projectStartup();
+run(fullfile(fileparts(mfilename('fullpath')), 'tools', 'projectStartup.m'));
 
 if ~isfield(options,'modelName') || isempty(options.modelName)
     options.modelName = fullfile('model','Modele_LQR_6DOF.slx');

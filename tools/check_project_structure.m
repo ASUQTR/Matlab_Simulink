@@ -17,25 +17,29 @@ requiredDirs = {
     fullfile('scripts', 'modeling')
     fullfile('scripts', 'analysis')
     fullfile('scripts', 'validation')
+    fullfile('scripts', 'config')
     'data'
     fullfile('data', 'formes')
     fullfile('data', 'generated')
     fullfile('data', 'runtime')
+    fullfile('data', 'experiments')
     'docs'
     'archive'
+    fullfile('archive', 'models')
+    fullfile('archive', 'scripts')
     'resources'
     'tools'
+    'tests'
     };
 
 requiredFiles = {
     'README.md'
     'ONBOARDING.md'
-    'PROJECT_SETUP.md'
     'PROJECT_MAP.md'
-    'projectStartup.m'
     'runWorkflow.m'
-    'startup.m'
     'ASUQTR_Control.prj'
+    fullfile('docs', 'PROJECT_SETUP.md')
+    fullfile('tools', 'projectStartup.m')
     fullfile('model', 'Modele_LQR_6DOF.slx')
     fullfile('model', 'callbacks', 'Parameters.m')
     fullfile('data', 'formes', 'sous marin en pentagone.mat')
@@ -47,9 +51,12 @@ generatedArtifacts = {
     fullfile('data', 'generated', 'Matrice_A_lineaire.mat')
     };
 
-allowedRootEntries = [
-    requiredFiles(1:8)
-    {
+allowedRootEntries = {
+    'README.md'
+    'ONBOARDING.md'
+    'PROJECT_MAP.md'
+    'runWorkflow.m'
+    'ASUQTR_Control.prj'
     '.git'
     '.gitignore'
     '.gitattributes'
@@ -62,9 +69,9 @@ allowedRootEntries = [
     'scripts'
     'sim_cache'
     'slprj'
+    'tests'
     'tools'
-    }
-    ];
+    };
 
 report = struct();
 report.projectRoot = projectRoot;

@@ -4,6 +4,7 @@ Ce dossier contient le code MATLAB source du pipeline, organise par intention.
 
 ## Sous-dossiers
 
+- `config/` : presets de simulation reutilisables (`scenario_default.m` et variantes).
 - `modeling/` : generation des matrices et calcul des artefacts de controle.
 - `analysis/` : visualisation, post-traitement et diagnostics de stabilite.
 - `validation/` : scripts de verification et essais de reglage.
