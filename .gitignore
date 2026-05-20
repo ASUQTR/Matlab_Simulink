@@ -3,6 +3,7 @@
 *.autosave
 *.slxc
 *.slxc.*
+*.slx.r20*
 slprj/
 sim_cache/
 codegen/

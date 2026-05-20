@@ -16,6 +16,7 @@ scriptsDir = fullfile(projectRoot, 'scripts');
 simDir     = fullfile(projectRoot, 'data', 'formes');
 genDir     = fullfile(projectRoot, 'data', 'generated');
 toolsDir   = fullfile(projectRoot, 'tools');
+modelDir   = fullfile(projectRoot, 'model');
 
 if isfolder(scriptsDir)
     addpath(genpath(scriptsDir));
@@ -28,6 +29,9 @@ if isfolder(genDir) && ~contains(path, genDir)
 end
 if isfolder(toolsDir) && ~contains(path, toolsDir)
     addpath(toolsDir);
+end
+if isfolder(modelDir) && ~contains(path, modelDir)
+    addpath(modelDir);
 end
 
 % Redirect Simulink cache and codegen away from the project root
