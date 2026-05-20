@@ -7,8 +7,8 @@ Ce dossier contient deux types de configuration independants.
 ## Vue d'ensemble
 
 ```
-"Quel sous-marin ?"  →  params_*.m    →  Parameters.m (callback modele)  →  blocs Simulink
-"Comment simuler ?"  →  scenario_*.m  →  runWorkflow(cfg)                 →  duree, figures
+"Quel sous-marin ?"  →  params_*.m  →  set_config()  →  AUV_Params.sldd  →  blocs Simulink
+"Comment simuler ?"  →  scenario_*.m  →  runWorkflow(cfg)                  →  duree, figures
 ```
 
 Ces deux dimensions sont orthogonales : on peut simuler le sous-marin nominal avec
@@ -20,7 +20,8 @@ librement les deux types.
 ## 1. Calibrations physiques — `params_*.m`
 
 Definissent les parametres physiques du sous-marin (masse, inertie, actionneurs).
-Utilises par `model/callbacks/Parameters.m` au demarrage de la simulation.
+Ces fichiers sont la **source de verite lisible** — les valeurs sont chargees dans
+`model/AUV_Params.sldd` via `set_config()`, et le modele Simulink les lit depuis le SLDD.
 
 | Fichier | Description |
 |---------|-------------|
@@ -28,12 +29,15 @@ Utilises par `model/callbacks/Parameters.m` au demarrage de la simulation.
 | `params_inertie_emile.m` | Variante avec inertie calculee par Emile |
 | `params_originaux.m` | Parametres du modele theorique initial (avant mesures sur le vrai robot) |
 
-**Changer de calibration** — modifier une seule ligne dans
-[model/callbacks/Parameters.m](../../model/callbacks/Parameters.m) :
+**Changer de calibration** — une seule commande dans la Command Window :
 
 ```matlab
-p = params_nominal();        % ← remplacer par la variante voulue
+set_config('nominal')    % valeurs mesurees 2026 (defaut git)
+set_config('emile')      % variante inertie Emile
+set_config('originaux')  % modele theorique initial
 ```
+
+Puis relancer `runWorkflow()`. Pas besoin de modifier de fichier.
 
 **Creer une variante** — surcharger uniquement ce qui change :
 

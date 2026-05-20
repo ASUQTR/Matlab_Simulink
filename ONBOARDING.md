@@ -22,7 +22,7 @@ C'est tout. Le projet s'occupe des chemins MATLAB au demarrage via Task Automati
 Dans MATLAB : **Home → Open → `ASUQTR_Control.prj`**
 
 MATLAB execute automatiquement `tools/projectStartup.m` a l'ouverture, ce qui :
-- ajoute `scripts/`, `data/formes/`, `data/generated/`, `tools/` au path
+- ajoute `scripts/`, `data/formes/`, `data/generated/`, `tools/`, `model/` au path
 - verifie que les fichiers requis sont presents
 
 > **Premiere fois sur cette machine ?** Verifier dans Project Settings → Task Automation que `tools/projectStartup.m` est bien dans "Startup files". Sinon l'ajouter manuellement (voir `docs/PROJECT_SETUP.md`).
@@ -37,12 +37,27 @@ simOut = runWorkflow();
 
 **Deux types de configuration independants :**
 
-| Type | Fichier | Controle |
-|------|---------|---------|
-| Calibration physique | `scripts/config/params_*.m` | Masse, inertie, actionneurs — modifie dans `Parameters.m` |
-| Scenario de simulation | `scripts/config/scenario_*.m` | Duree, figures, exports — passe a `runWorkflow` |
+| Type | Comment changer | Controle |
+|------|----------------|---------|
+| Calibration physique | `set_config('nominal')` dans la Command Window | Masse, inertie, actionneurs |
+| Scenario de simulation | `cfg = scenario_default(); cfg.stopTime = 30;` passe a `runWorkflow` | Duree, figures, exports |
 
-Exemple — changer la duree et sauvegarder les figures :
+### Changer de calibration physique
+
+```matlab
+set_config('nominal')    % valeurs mesurees 2026 (defaut)
+set_config('emile')      % variante avec inertie calculee par Emile
+set_config('originaux')  % modele theorique initial (avant mesures)
+```
+
+Puis relancer `runWorkflow()`. Le modele Simulink lit les parametres
+directement depuis `model/AUV_Params.sldd` — pas besoin de modifier de fichier.
+
+> **C'est quoi le SLDD ?** Un fichier de parametres directement branche sur le modele
+> Simulink. `set_config` met a jour ce fichier, le modele le relit automatiquement.
+> Les sources de chaque calibration restent dans `scripts/config/params_*.m`.
+
+### Changer les options de simulation
 
 ```matlab
 cfg = scenario_default();   % scripts/config/scenario_default.m
@@ -50,9 +65,6 @@ cfg.stopTime    = 30;
 cfg.saveFigures = true;
 simOut = runWorkflow(cfg);
 ```
-
-Pour changer la calibration physique : modifier `model/callbacks/Parameters.m`,
-remplacer `params_nominal()` par la variante voulue.
 
 Voir `scripts/config/README.md` pour la liste complete et des exemples.
 
@@ -77,7 +89,8 @@ Les sorties sont sauvegardees automatiquement :
 
 - **"File not found"** : verifier que `data/formes/sous marin en pentagone.mat` existe.
 - **"Undefined function"** : le projet n'est peut-etre pas ouvert. Rouvrir `ASUQTR_Control.prj`.
-- **Artefacts manquants** : les fichiers `data/generated/*.mat` (ABmatrice, calcul_Q, etc.) sont recalculables — relancer les scripts dans `scripts/modeling/` dans l'ordre.
+- **Artefacts manquants** : les fichiers `data/generated/*.mat` sont recalculables — relancer les scripts dans `scripts/modeling/` dans l'ordre.
+- **SLDD introuvable** : executer `create_sldd()` dans la Command Window (a faire une seule fois par machine).
 
 ---
 
@@ -86,18 +99,22 @@ Les sorties sont sauvegardees automatiquement :
 ```
 ASUQTR_Control.prj   ← ouvrir ceci
 runWorkflow.m        ← lancer ceci
-model/               ← modele Simulink + parametres
+model/
+  Modele_LQR_6DOF.slx   ← modele Simulink
+  AUV_Params.sldd        ← parametres physiques actifs (config active)
 scripts/
   modeling/          ← generation matrices A, B, Q, K
   analysis/          ← graphiques, animation, stabilite
   validation/        ← verification du reglage
-  config/            ← presets de simulation (scenario_default, etc.)
+  config/            ← calibrations (params_*.m) et scenarios (scenario_*.m)
+tools/
+  set_config.m       ← changer de calibration
+  create_sldd.m      ← setup initial du SLDD (1 fois par machine)
 data/
   formes/            ← trajectoires/scenarios (requis)
   generated/         ← artefacts recalculables (gitignore)
   experiments/       ← variantes de tuning versionnees
   runtime/           ← sorties de simulation (gitignore)
-tests/               ← tests formels (unit/, integration/)
 archive/
   models/            ← anciens .slx
   scripts/           ← anciens .m
@@ -116,5 +133,6 @@ Pour savoir "quel fichier fait quoi" : `PROJECT_MAP.md`.
 | `K` | Gain de retour d'etat calcule par LQR |
 | `out` | Objet `Simulink.SimulationOutput` contenant les signaux |
 | poles | Valeurs propres boucle fermee — partie reelle > 0 = instabilite |
+| SLDD | Simulink Data Dictionary — fichier de parametres branche directement sur le modele |
 
 Glossaire complet : `docs/glossaire.md`
