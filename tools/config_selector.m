@@ -49,18 +49,22 @@ uibutton(fig, ...
     'ButtonPushedFcn', @(~,~) appliquer(dd.Value, true));
 
     function appliquer(variant, simuler)
+        % Appliquer la calibration (erreurs affichees dans la fenetre)
         try
             set_config(variant);
-            if simuler
-                close(fig);
-                runWorkflow();
-            else
-                uialert(fig, ...
-                    sprintf('Calibration appliquee : params_%s', variant), ...
-                    'OK', 'Icon', 'success');
-            end
         catch err
             uialert(fig, err.message, 'Erreur', 'Icon', 'error');
+            return;
+        end
+
+        if simuler
+            % Fermer la fenetre puis simuler — erreurs visibles dans Command Window
+            close(fig);
+            runWorkflow();
+        else
+            uialert(fig, ...
+                sprintf('Calibration appliquee : params_%s', variant), ...
+                'OK', 'Icon', 'success');
         end
     end
 
