@@ -1,4 +1,4 @@
-function p = params_inertie_emile()
+function p = params_emile()
 % Variante : inertie calculee par Emile.
 % Differe de params_nominal uniquement sur I_x, I_y, I_z.
 
