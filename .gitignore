@@ -1,0 +1,26 @@
+# MATLAB / Simulink artifacts
+*.asv
+*.autosave
+*.slxc
+*.slxc.*
+slprj/
+sim_cache/
+codegen/
+*~
+
+# MATLAB generated data (keep the folder, ignore recalculable contents)
+/data/generated/*
+!/data/generated/.gitkeep
+
+# Runtime simulation outputs (auto-saved, non-versionnable)
+/data/runtime/*.mat
+/data/runtime/history/
+
+# MATLAB project auto-generated metadata (garder seulement Project.xml)
+resources/project/*/
+resources/project/rootp.xml
+
+# Ignore user/project-specific MATLAB files, but keep the shared project file.
+*.prj
+!ASUQTR_Control.prj
+preferences.m
