@@ -4,24 +4,42 @@ Scripts executes automatiquement par Simulink a l'ouverture du modele.
 
 ## Contenu
 
-- `Parameters.m` : charge la calibration physique active et exporte les variables au workspace Simulink.
+- `Parameters.m` : charge les matrices LQR calculees et les exporte au workspace.
 
 ## Ce que fait Parameters.m
 
-1. Appelle la calibration active (ex: `params_nominal()` dans `scripts/config/`)
-2. Charge les matrices LQR depuis `data/generated/` (calcul_Q.mat, Matrice_A_lineaire.mat)
-3. Exporte toutes les variables au base workspace pour que les blocs Simulink y aient acces
+Depuis la migration SLDD, ce callback ne charge plus les parametres physiques —
+ceux-ci viennent directement de `model/AUV_Params.sldd`, lie au modele.
 
-**Changer de calibration** : modifier la ligne `p = params_nominal()` dans `Parameters.m`.
-Les options disponibles sont dans `scripts/config/params_*.m`.
+Il charge uniquement :
+1. `calcul_Q.mat` → `Q_final`, `Q_envoyer`
+2. `Matrice_A_lineaire.mat` → `A_num`
+
+## Changer de calibration
+
+```matlab
+set_config('nominal')    % valeurs mesurees 2026 (defaut)
+set_config('emile')      % variante inertie Emile
+set_config('originaux')  % modele theorique initial
+```
+
+Les sources de chaque calibration sont dans `scripts/config/params_*.m`.
 
 ## Dependances
 
-- `scripts/config/params_*.m` — calibration physique active
+- `model/AUV_Params.sldd` — parametres physiques (lie au modele .slx)
 - `data/generated/calcul_Q.mat` — matrice Q du LQR
 - `data/generated/Matrice_A_lineaire.mat` — matrice A numerique
-- `data/formes/sous marin en pentagone.mat` — trajectoire de reference
 
-## Regle
+## Setup initial (1ere fois sur une machine)
 
-Si vous ajoutez une nouvelle dependance au demarrage du modele, documentez-la ici et dans `data/README.md`.
+```matlab
+create_sldd()   % cree model/AUV_Params.sldd depuis params_nominal
+```
+
+Puis lier le modele au SLDD (une seule fois) :
+```matlab
+load_system('model/Modele_LQR_6DOF');
+set_param('Modele_LQR_6DOF', 'DataDictionary', 'AUV_Params.sldd');
+save_system('model/Modele_LQR_6DOF');
+```
