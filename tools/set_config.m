@@ -37,12 +37,12 @@ dSect = getSection(d, 'Design Data');
 
 fields = fieldnames(p);
 for i = 1:numel(fields)
-    val = p.(fields{i});
-    if existEntry(dSect, fields{i})
+    param = Simulink.Parameter(p.(fields{i}));
+    try
         entry = getEntry(dSect, fields{i});
-        setValue(entry, Simulink.Parameter(val));
-    else
-        addEntry(dSect, fields{i}, Simulink.Parameter(val));
+        setValue(entry, param);
+    catch
+        addEntry(dSect, fields{i}, param);
     end
 end
 
