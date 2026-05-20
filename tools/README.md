@@ -9,6 +9,7 @@ Utilitaires ponctuels et scripts d'infrastructure. Pas le pipeline de simulation
 | `projectStartup.m` | Configure les chemins MATLAB au demarrage du projet. Appele automatiquement par Task Automation — ne pas appeler manuellement. |
 | `create_sldd.m` | Cree `model/AUV_Params.sldd` depuis `params_nominal`. A executer une seule fois au setup. |
 | `set_config.m` | Change la calibration active dans le SLDD : `set_config('emile')`. |
+| `config_selector.m` | Fenetre graphique pour changer de calibration et lancer la simulation. |
 | `check_project_structure.m` | Verifie que l'arborescence attendue est presente (non-destructif). |
 | `create_matlab_project.m` | Aide a creer/reinitialiser le `.prj` MATLAB. |
 
