@@ -41,6 +41,11 @@ Simulink.fileGenControl('set', ...
 
 fprintf('projectStartup: paths configured from %s\n', projectRoot);
 
+% Initialiser la variable de trajectoire si absente du workspace
+if ~exist('TRAJECTOIRE', 'var')
+    assignin('base', 'TRAJECTOIRE', int32(1));
+end
+
 % Basic checks (non-fatal)
 sigPath = fullfile(simDir, 'sous marin en pentagone.mat');
 if ~exist(sigPath, 'file')
