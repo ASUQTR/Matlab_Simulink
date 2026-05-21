@@ -41,9 +41,21 @@ Simulink.fileGenControl('set', ...
 
 fprintf('projectStartup: paths configured from %s\n', projectRoot);
 
-% Initialiser la variable de trajectoire si absente du workspace
-if ~exist('TRAJECTOIRE', 'var')
+% Initialiser les variables de workspace si absentes
+if ~evalin('base', 'exist(''TRAJECTOIRE'', ''var'')')
     assignin('base', 'TRAJECTOIRE', int32(1));
+end
+if ~evalin('base', 'exist(''YAW_MODE'', ''var'')')
+    assignin('base', 'YAW_MODE', int32(0));
+end
+if ~evalin('base', 'exist(''T_TRAJ'', ''var'')')
+    assignin('base', 'T_TRAJ', 30.0);
+end
+if ~evalin('base', 'exist(''SIZE_TRAJ'', ''var'')')
+    assignin('base', 'SIZE_TRAJ', 2.0);
+end
+if ~evalin('base', 'exist(''CONTROLLER_VARIANT'', ''var'')')
+    assignin('base', 'CONTROLLER_VARIANT', 'nominal');
 end
 
 % Basic checks (non-fatal)

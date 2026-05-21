@@ -44,10 +44,10 @@ if ~isfield(options,'runMouvement')
     options.runMouvement = false;
 end
 if ~isfield(options,'runStability')
-    options.runStability = true;
+    options.runStability = false;
 end
 if ~isfield(options,'reportInstability')
-    options.reportInstability = true;
+    options.reportInstability = false;
 end
 if ~isfield(options,'openModel')
     options.openModel = false;
@@ -72,13 +72,19 @@ if ~isfield(options,'closeFiguresAfterSave')
     options.closeFiguresAfterSave = false;
 end
 if ~isfield(options,'saveSimulationData')
-    options.saveSimulationData = true;
+    options.saveSimulationData = false;
 end
 if ~isfield(options,'saveSimulationHistory')
-    options.saveSimulationHistory = true;
+    options.saveSimulationHistory = false;
+end
+if ~isfield(options,'promptSaveAfter')
+    options.promptSaveAfter = true;
 end
 if ~isfield(options,'simulationLabel') || isempty(options.simulationLabel)
     options.simulationLabel = '';
+end
+if ~isfield(options,'fixedStep') || isempty(options.fixedStep)
+    options.fixedStep = 0;
 end
 
 projectRoot = fileparts(mfilename('fullpath'));
@@ -102,12 +108,16 @@ if options.openModel
     open_system(modelPath);
 end
 
+if options.fixedStep > 0
+    [~, modelShortName] = fileparts(modelPath);
+    try
+        set_param(modelShortName, 'FixedStep', num2str(options.fixedStep));
+    catch
+        warning('runWorkflow:fixedStep', 'Pas de temps non applique — verifier que le solver est en mode fixe.');
+    end
+end
 simOut = sim(modelPath, 'StopTime', num2str(options.stopTime));
 out = simOut; %#ok<NASGU>
-
-if options.saveSimulationData || options.saveSimulationHistory
-    save_simulation_data(simOut, options, runtimeOutputDir, historyOutputDir);
-end
 
 if options.runGraphique
     run(fullfile(projectRoot, 'scripts', 'analysis', 'Graphique.m'));
@@ -130,6 +140,16 @@ if options.reportInstability
     else
         fprintf('Stability report skipped: out.A_s / out.B_s / out.K_s not available.\n');
     end
+end
+
+% Sauvegarde automatique si demandee programmatiquement
+if options.saveSimulationData || options.saveSimulationHistory
+    save_simulation_data(simOut, options, runtimeOutputDir, historyOutputDir);
+else
+    % Garder les donnees accessibles dans le workspace pour sauvegarde manuelle
+    assignin('base', 'simOut', simOut);
+    assignin('base', 'out',    simOut);
+    fprintf('\nPour sauvegarder : save_last_simulation()   ou   save_last_simulation(''label'')\n');
 end
 
 end

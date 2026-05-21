@@ -1,3 +1,26 @@
+% calcul_matrice_A_lineaire.m
+%
+% MÉTHODE : fixed_point — linéarisation à UN point d'opération fixe.
+%   Ce script calcule K une seule fois au point hardcodé ci-dessous,
+%   puis trace les pôles de A - B*K pour vérifier la stabilité.
+%
+% DIFFÉRENCE AVEC LE MODÈLE EN SIMULATION :
+%   Le modèle Simulink utilise la méthode 'gain_scheduling' : il re-linéarise
+%   A autour de l'état courant x(t) à chaque pas et re-résout Riccati.
+%   Ce script sert à explorer l'approche fixed_point et valider Q/R.
+%
+% REMPLACÉ PAR (pour usage courant) :
+%   compute_controller('nominal_fixedpoint')
+%   → charge lqr_nominal_fixedpoint.m (point d'opération versionné)
+%   → sauvegarde controller_nominal_fixedpoint.mat
+%
+% ENTRÉES :
+%   data/generated/ABmatrice.mat  — matrices A/B symboliques
+%   data/generated/calcul_Q.mat   — Q_final (généré par trouver_matrice_Q.m)
+%
+% SORTIES :
+%   data/generated/Matrice_A_lineaire.mat — A_num au point d'opération
+%   figure(10) — carte des pôles de la boucle fermée
 
 projectRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 generatedDataDir = fullfile(projectRoot, 'data', 'generated');

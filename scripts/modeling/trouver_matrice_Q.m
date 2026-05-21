@@ -1,3 +1,36 @@
+% trouver_matrice_Q.m
+%
+% RÔLE : Calcul exploratoire de la matrice de coût Q du LQR.
+%
+% MÉTHODE :
+%   Q_sym = A' * B * inv(R_design) * B' * A   (symbolique)
+%   puis évaluation numérique en substituant les valeurs d'états max/min
+%   observées dans une simulation de référence.
+%
+%   Cette approche dérive Q depuis la structure des matrices du système
+%   plutôt que de le fixer manuellement (méthode de Bryson modifiée).
+%
+%   Pour adapter le Q : modifier les valeurs de substitution en bas du script
+%   (actuellement vals = [0.1 0.1 0.1 1 1 1 1 1 1 1 1 1 0.26]).
+%
+% RELATION AVEC L'ARCHITECTURE ACTUELLE :
+%   - Le Q_final produit ici est utilisé par COMPUTE_CONTROLLER pour versionner
+%     les configs dans scripts/config/lqr/lqr_*.m (champ q_state_vals).
+%   - En simulation, Q_final est chargé par Parameters.m et transmis au modèle
+%     Simulink qui l'utilise à chaque pas (gain scheduling).
+%
+% REMPLACÉ PAR (pour usage courant) :
+%   compute_controller('nominal')
+%   → charge q_state_vals depuis lqr_nominal.m et recalcule Q en une étape
+%
+% ENTRÉES :
+%   data/generated/ABmatrice.mat       — matrices A/B symboliques
+%   data/runtime/info_simulation.mat   — dernière simulation (pour stats états)
+%
+% SORTIES :
+%   data/generated/calcul_Q.mat        — Q_final (matrice 12×12)
+%   affichage console des max/min de chaque état
+
 projectRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 generatedDataDir = fullfile(projectRoot, 'data', 'generated');
 runtimeDataDir = fullfile(projectRoot, 'data', 'runtime');
