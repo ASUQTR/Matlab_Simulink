@@ -57,6 +57,9 @@ end
 if ~evalin('base', 'exist(''CONTROLLER_VARIANT'', ''var'')')
     assignin('base', 'CONTROLLER_VARIANT', 'nominal');
 end
+if ~evalin('base', 'exist(''Ts'', ''var'')')
+    assignin('base', 'Ts', 0.001);  % 1kHz — doit etre <= plus petit sample time du modele (ZOH2 = 0.001)
+end
 
 % Basic checks (non-fatal)
 sigPath = fullfile(simDir, 'sous marin en pentagone.mat');

@@ -109,12 +109,7 @@ if options.openModel
 end
 
 if options.fixedStep > 0
-    [~, modelShortName] = fileparts(modelPath);
-    try
-        set_param(modelShortName, 'FixedStep', num2str(options.fixedStep));
-    catch
-        warning('runWorkflow:fixedStep', 'Pas de temps non applique — verifier que le solver est en mode fixe.');
-    end
+    assignin('base', 'Ts', options.fixedStep);
 end
 simOut = sim(modelPath, 'StopTime', num2str(options.stopTime));
 out = simOut; %#ok<NASGU>

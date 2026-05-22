@@ -21,7 +21,7 @@ state (y) ──→ [linearize_A] ──→ A ──→ [compute_K] ──→ K 
               Q_envoyer ────────────────┤
               CONTROL_METHOD_NUM ───────┤  (blocs Constant depuis workspace)
               K ────────────────────────┤
-              Clock / dt ───────────────┘
+              Constant(Ts) ─────────────┘  (dt = pas fixe du solver)
 ```
 
 ### Bloc `linearize_A`
@@ -65,6 +65,8 @@ u = -K * (state - target_state)
 | `K` | `Parameters.m` | Gain pre-calcule pour le mode fixed_point |
 | `CONTROL_METHOD_NUM` | `Parameters.m` | 0 = gain_scheduling, 1 = fixed_point |
 | `CONTROLLER_VARIANT` | `projectStartup.m` | Nom de la variante active (ex: `'nominal'`) |
+| `Ts` | `projectStartup.m` | Pas de simulation (s) — lu par le solver et le bloc Constant(dt) |
+| `T_TRAJ` | `projectStartup.m` / GUI | Duree simulation = stop time Simulink |
 
 Toutes ces variables sont assignees automatiquement au demarrage via
 `projectStartup.m` + `Parameters.m`. Ne pas les assigner manuellement.
@@ -73,25 +75,23 @@ Toutes ces variables sont assignees automatiquement au demarrage via
 
 ## Configuration du solver Simulink
 
-**Reglage actuel :** Variable-step, auto — correct mais imprecis pour l'integration Riccati.
-
-**Reglage recommande :** Fixed-step, ode4, step = 0.01s (100 Hz)
+**Reglage actuel :** Fixed-step, ode4, step = `Ts` (variable workspace)
 
 ```
 Configuration Parameters → Solver
   Type        : Fixed-step
   Solver      : ode4 (Runge-Kutta)
-  Step size   : 0.01
+  Step size   : Ts          ← variable workspace (defaut : 0.01 s = 100 Hz)
+  Stop time   : T_TRAJ      ← variable workspace (duree trajectoire)
 ```
 
-Avantages :
-- `dt` constant → integration Riccati exacte (P = P + 0.01 * P_dot a chaque pas)
-- Simulation 3-5x plus rapide (pas d'adaptation du pas)
-- Plus realiste : 100 Hz = frequence typique d'un controleur AUV embarque
-- Permet de remplacer le bloc `Clock` par un `Constant(0.01)` — plus simple
+Pour changer la frequence de simulation : modifier `Ts` dans `projectStartup.m`
+ou utiliser le champ "Frequence de boucle" dans `config_selector`.
 
-> **TODO :** appliquer ce reglage et remplacer Clock → Constant(0.01).
-> Voir `block_compute_K.m` — le port `t` devient `dt`, supprimer `persistent t_prev`.
+Avantages du fixed-step :
+- `dt` constant → integration Riccati stable (Euler avant)
+- Simulation deterministe et reproductible
+- Tous les blocs a sample time variable (`ZOH`, `White Noise`) heritent de `Ts` automatiquement
 
 ---
 

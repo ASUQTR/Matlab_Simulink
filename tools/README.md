@@ -15,6 +15,7 @@ Utilitaires ponctuels et scripts d'infrastructure. Pas le pipeline de simulation
 | `set_config.m` | Change la calibration active dans le SLDD : `set_config('emile')`. |
 | `create_sldd.m` | Cree `model/AUV_Params.sldd` depuis `params_nominal`. A executer une seule fois au setup. |
 | `init_project.m` | Initialisation et verification one-shot du projet (creation dossiers, archivage, verification integrite). |
+| `apply_compute_K.m` | Met a jour le code du bloc MATLAB Function `compute_K` dans le `.slx` depuis `model/block_compute_K.m`. A relancer apres chaque modification du fichier source. |
 | `check_project_structure.m` | Verifie que l'arborescence attendue est presente (non-destructif). |
 | `create_matlab_project.m` | Aide a creer/reinitialiser le `.prj` MATLAB. |
 

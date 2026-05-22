@@ -95,7 +95,13 @@ efSize = uieditfield(fig, 'numeric', ...
 
 ddTraj.ValueChangedFcn = @(src, ~) updateDefaults(src.Value, efStop, efSize);
 
-uilabel(fig, 'Text', 'Frequence de boucle (Hz)   [0 = solver auto]', ...
+try
+    tsVal   = evalin('base', 'Ts');
+    tsHint  = sprintf('0 = Ts du solver (%.4g s = %g Hz)', tsVal, 1/tsVal);
+catch
+    tsHint  = '0 = Ts du solver';
+end
+uilabel(fig, 'Text', sprintf('Frequence de boucle (Hz)   [%s]', tsHint), ...
     'Position', [20 254 300 14], 'FontColor', [0.45 0.45 0.45], 'FontSize', 9);
 
 efStep = uieditfield(fig, 'numeric', ...

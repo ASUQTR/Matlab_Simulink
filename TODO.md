@@ -1,52 +1,20 @@
 # TODO — Travaux en suspens
 
-> Mis à jour : 2026-05-21
-> Branche active : `feature/sldd`
+> Mis à jour : 2026-05-22
+> Branche active : `feature/controller-refactor`
 
 ---
 
 ## PRIORITÉ HAUTE
 
-### 1. Passer le solver Simulink en fixed-step ode4 (0.01s)
-Le solver actuel (variable-step auto) donne un `dt` variable, ce qui rend
-l'intégration Riccati moins précise et la simulation plus lente.
+### 1. Nettoyer les connexions obsolètes dans Simulink
+Warnings persistants lors de la simulation :
+- `ROV model/ROV model/Add` — Input Port 2 non connecté
+- `ROV model/ROV model/Constant27` — Output Port 1 non connecté
 
 **Ce qu'il faut faire dans Simulink :**
-```
-Configuration Parameters → Solver
-  Type      : Fixed-step
-  Solver    : ode4 (Runge-Kutta)
-  Step size : 0.01
-```
-
-Puis dans le bloc `compute_K` (Simulink) :
-- Remplacer le bloc `Clock` par un bloc `Constant` avec valeur `0.01`
-- Renommer le port `t` → `dt` dans le bloc
-- Supprimer `persistent t_prev` dans `block_compute_K.m`
-- Simplifier `gain_scheduling(A, Q_files, dt)` : plus besoin de calculer `dt = t - t_prev`
-
-**Fichier à modifier :** `model/block_compute_K.m`
-
----
-
-### 2. Nettoyer les connexions obsolètes dans Simulink
-Warnings lors de la simulation : ports Demux 7-12 non connectés, port Add non connecté.
-Ces fils venaient de l'ancien bloc `ABmatrix` (qui sortait R, Q, A, B séparément).
-
-**Ce qu'il faut faire dans Simulink :**
-- Supprimer les blocs `out.R_s`, `out.Q_s`, `out.A_s`, `out.B_s` (si encore présents)
-- Déconnecter / supprimer les fils pendants dans le subsystem `Controller`
-- Vérifier le subsystem `ROV model` (port Add non connecté)
-
----
-
-### 3. Valider la simulation end-to-end
-La simulation a tourné une fois mais a été interrompue (Ctrl-C).
-Lancer une simulation complète (30s, trajectoire carrée, rayon 1m) et vérifier :
-- Pas d'erreur ni d'exception
-- La trajectoire converge (pas de divergence)
-- Les graphiques s'affichent correctement
-- `save_last_simulation()` fonctionne après le run
+- Ouvrir le subsystem `ROV model/ROV model`
+- Identifier et connecter ou supprimer le bloc `Add` et `Constant27` inutilisés
 
 ---
 
@@ -111,6 +79,19 @@ Optionnellement fusionner le sélecteur de contrôleur directement dans `config_
 pour éviter d'ouvrir une deuxième fenêtre.
 
 ---
+
+## FAIT (session 2026-05-22)
+
+- [x] Solver Simulink : Fixed-step, ode4, step = `Ts` (variable workspace)
+- [x] Stop time Simulink : `T_TRAJ` (variable workspace)
+- [x] `block_compute_K.m` : port `t` → `dt`, supprimé `persistent t_prev`, simplifié
+- [x] Bloc `compute_K` dans .slx mis à jour via `apply_compute_K()` (nouveau script)
+- [x] Bloc `Constant(Ts)` ajouté dans Controller, relié au port `dt` de `compute_K`
+- [x] `ZOH2` et blocs `White Noise` : sample time → `Ts`
+- [x] `projectStartup.m` : initialise `Ts = 0.01` (100 Hz par défaut)
+- [x] `runWorkflow.m` : override fixedStep via `assignin('base','Ts',...)` au lieu de `set_param`
+- [x] `config_selector` : label "Fréquence de boucle" affiche la valeur `Ts` courante dynamiquement
+- [x] Simulation end-to-end validée : 30s, trajectoire carrée, rayon 1m, sans erreur
 
 ## FAIT (session 2026-05-21)
 

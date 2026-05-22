@@ -4,44 +4,39 @@
 %           Q_files            (12x12) — workspace : Q_envoyer
 %           CONTROL_METHOD_NUM (1x1)   — workspace : CONTROL_METHOD_NUM
 %           K_fixed            (8x12)  — workspace : K
-%           t                  (1x1)   — depuis bloc Clock
+%           dt                 (1x1)   — depuis bloc Constant (0.01)
 % Sortie  : K                  (8x12)
 %
 % Coller ce code directement dans le MATLAB Function block.
 % =========================================================
 
-function K = compute_K(A, Q_files, CONTROL_METHOD_NUM, K_fixed, t)
+function K = compute_K(A, Q_files, CONTROL_METHOD_NUM, K_fixed, dt)
 
 K = zeros(8, 12);
 
 if CONTROL_METHOD_NUM == 1
     K = K_fixed;
 else
-    K = gain_scheduling(A, Q_files, t);
+    K = gain_scheduling(A, Q_files, dt);
 end
 
 end
 
 % ---------------------------------------------------------
 
-function K = gain_scheduling(A, Q_files, t)
+function K = gain_scheduling(A, Q_files, dt)
 % Resout l'equation de Riccati en temps reel (Euler avant).
 % Equivalent a l'ancien mRiccati + integrateur, sans appel extrinsic.
 
-persistent P t_prev;
+persistent P;
 
 B = get_B();
 Q = diag(diag(Q_files));
 R = 10 * eye(8);
 
 if isempty(P)
-    % Condition initiale : P = Q (symetrique definie positive, convergence rapide)
-    P      = Q;
-    t_prev = t;
+    P = Q;
 end
-
-dt = t - t_prev;
-t_prev = t;
 
 if dt > 0
     % dP/dt = A'P + PA - PB R^{-1} B'P + Q  (equation de Riccati continue)

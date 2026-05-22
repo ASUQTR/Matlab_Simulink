@@ -4,6 +4,7 @@
 *.slxc
 *.slxc.*
 *.slx.r20*
+*.slx.original
 slprj/
 sim_cache/
 codegen/
