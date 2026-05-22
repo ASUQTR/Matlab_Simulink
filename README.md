@@ -36,27 +36,27 @@ Si vous arrivez sur le projet pour la premiere fois, commencez ici:
 
 ## Points à retenir
 
-- `Parameters.m` et `Generate_PyMatrix.m` portent le cœur de la modélisation.
-- `calcul_matrice_A_lineaire.m` transforme le modèle symbolique en matrices numériques exploitables pour le contrôle.
-- `trouver_matrice_Q.m` et `test_calculQ.m` servent à concevoir et valider la matrice de coût du LQR.
-- Les scripts `Graphique.m`, `mouvement.m` et `instabiliter_graphique.m` sont des outils d'analyse et de présentation des résultats.
-- Les fichiers `.slx` complètent la chaîne de simulation, mais la logique se trouve dans les scripts MATLAB.
+- Le workflow est **GUI-first** : ouvrir `ASUQTR_Control.prj`, puis utiliser `config_selector()`.
+- `config_selector.m` + `controller_selector.m` remplacent les anciens scripts de configuration manuels.
+- `compute_controller.m` calcule Q et K — les scripts `trouver_matrice_Q.m` et `calcul_matrice_A_lineaire.m` sont des références legacy documentées.
+- Les sauvegardes de simulation sont **manuelles** via `save_last_simulation()` (pas automatiques).
+- `Parameters.m` (callback modele) charge le bon controleur et exporte les variables workspace au demarrage de la simulation.
 
-## Pipeline MATLAB (vue d'ensemble)
+## Pipeline GUI (vue d'ensemble)
 
 ```mermaid
 flowchart TD
-    P["Parameters.m"] --> GPM["Generate_PyMatrix.m"]
-    GPM --> AB["ABmatrice.mat\n(symbolic A,B)"]
-    AB --> CAL["calcul_matrice_A_lineaire.m"]
-    CAL --> ANUM["Matrice_A_lineaire.mat\n(A_num, B_num)"]
-    P --> CAL
-    QF["trouver_matrice_Q.m"] --> QMAT["calcul_Q.mat\n(Q_final)"]
-    QMAT --> CAL
-    CAL --> K["K_LQR.mat\n(K)"]
-    K --> SIM["Simulink (.slx) / Simulation"]
-    SIM --> POST["Graphique.m / instabiliter_graphique.m"]
-    POST --> FIGS["docs/figures (images)"]
+    PRJ["ASUQTR_Control.prj"] --> STARTUP["projectStartup.m\n(chemins + init)"]
+    STARTUP --> GUI["config_selector()\ntrajectoire + calibration"]
+    GUI --> CTRL["controller_selector()\nvariante LQR"]
+    CTRL --> COMP["compute_controller()\nQ_final + K"]
+    COMP --> MAT["controller_<variant>.mat"]
+    GUI --> RUN["runWorkflow(opts)"]
+    MAT --> PARAM["Parameters.m (callback)\ncharge K, exporte CONTROL_METHOD_NUM"]
+    PARAM --> SIM["Simulink (.slx)"]
+    RUN --> SIM
+    SIM --> POST["Graphique / mouvement / instabiliter_graphique"]
+    POST --> SAVE["save_last_simulation()\ndata/runtime/history/"]
 ```
 
 ---

@@ -5,7 +5,7 @@ function config_selector()
 %   config_selector()
 
 thisFile    = mfilename('fullpath');
-projectRoot = fileparts(fileparts(thisFile));  %#ok<NASGU>
+projectRoot = fileparts(fileparts(thisFile));
 
 % Valeurs par defaut selon la trajectoire [carre, cercle, lissajous]
 stopDefaults = [120,  65, 130];
@@ -53,9 +53,15 @@ ddCalib = uidropdown(fig, ...
 
 uibutton(fig, ...
     'Text', sprintf('Controleur LQR : %s     [modifier...]', cv), ...
-    'Position', [20 418 300 36], 'FontSize', 10, ...
+    'Position', [20 418 190 36], 'FontSize', 10, ...
     'BackgroundColor', [0.91 0.94 0.99], ...
     'ButtonPushedFcn', @(~,~) controller_selector());
+
+uibutton(fig, ...
+    'Text', 'Editer config LQR', ...
+    'Position', [215 418 105 36], 'FontSize', 10, ...
+    'BackgroundColor', [0.95 0.95 0.95], ...
+    'ButtonPushedFcn', @(~,~) editer_config_lqr());
 
 % Separateur
 uilabel(fig, 'Text', repmat(char(9472), 1, 38), ...
@@ -160,6 +166,20 @@ uilabel(fig, 'Text', 'Tip : save_last_simulation() pour sauvegarder apres run', 
 
 % ─────────────────────────── Callbacks ───────────────────────────────
 
+    function editer_config_lqr()
+        try
+            variant = char(evalin('base', 'CONTROLLER_VARIANT'));
+        catch
+            variant = 'nominal';
+        end
+        lqrFile = fullfile(projectRoot, 'scripts', 'config', 'lqr', ['lqr_' variant '.m']);
+        if ~isfile(lqrFile)
+            uialert(fig, sprintf('Fichier introuvable :\n%s', lqrFile), 'Erreur', 'Icon', 'error');
+            return;
+        end
+        edit(lqrFile);
+    end
+
     function updateDefaults(trajVal, fStop, fSize)
         idx = max(1, min(3, double(int32(trajVal))));
         fStop.Value = stopDefaults(idx);
@@ -179,6 +199,25 @@ uilabel(fig, 'Text', 'Tip : save_last_simulation() pour sauvegarder apres run', 
         end
 
         if simuler
+            % Auto-calculer le controleur si le .mat n'existe pas encore
+            try
+                cv = char(evalin('base', 'CONTROLLER_VARIANT'));
+            catch
+                cv = 'nominal';
+            end
+            ctrlPath = fullfile(projectRoot, 'data', 'generated', ...
+                sprintf('controller_%s.mat', cv));
+            if ~isfile(ctrlPath)
+                try
+                    fprintf('controller_%s.mat absent — calcul automatique...\n', cv);
+                    compute_controller(cv);
+                catch err
+                    uialert(fig, sprintf('Erreur calcul controleur "%s" :\n%s', cv, err.message), ...
+                        'Erreur', 'Icon', 'error');
+                    return;
+                end
+            end
+
             close(fig);
             opts = struct( ...
                 'stopTime',          stopTime, ...

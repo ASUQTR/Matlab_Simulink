@@ -1,19 +1,16 @@
 # Scripts/Config
 
-Ce dossier contient deux types de configuration independants.
+Ce dossier contient trois types de configuration independants.
 
 ---
 
 ## Vue d'ensemble
 
 ```
-"Quel sous-marin ?"  →  params_*.m  →  set_config()  →  AUV_Params.sldd  →  blocs Simulink
-"Comment simuler ?"  →  scenario_*.m  →  runWorkflow(cfg)                  →  duree, figures
+"Quel sous-marin ?"     →  params_*.m  →  set_config()  →  AUV_Params.sldd  →  blocs Simulink
+"Quel controleur LQR ?" →  lqr/lqr_*.m  →  compute_controller()  →  controller_<variant>.mat
+"Comment simuler ?"     →  scenario_*.m  →  runWorkflow(cfg)  →  duree, figures
 ```
-
-Ces deux dimensions sont orthogonales : on peut simuler le sous-marin nominal avec
-un scenario court, ou le sous-marin original avec un scenario complet, en combinant
-librement les deux types.
 
 ---
 
@@ -26,10 +23,10 @@ Ces fichiers sont la **source de verite lisible** — les valeurs sont chargees 
 | Fichier | Description |
 |---------|-------------|
 | `params_nominal.m` | **Reference active** — valeurs mesurees sur le sous-marin reel (2026) |
-| `params_inertie_emile.m` | Variante avec inertie calculee par Emile |
+| `params_emile.m` | Variante avec inertie calculee par Emile |
 | `params_originaux.m` | Parametres du modele theorique initial (avant mesures sur le vrai robot) |
 
-**Changer de calibration** — une seule commande dans la Command Window :
+**Changer de calibration** — via le GUI ou la Command Window :
 
 ```matlab
 set_config('nominal')    % valeurs mesurees 2026 (defaut git)
@@ -37,64 +34,38 @@ set_config('emile')      % variante inertie Emile
 set_config('originaux')  % modele theorique initial
 ```
 
-Puis relancer `runWorkflow()`. Pas besoin de modifier de fichier.
+---
 
-**Creer une variante** — surcharger uniquement ce qui change :
+## 2. Controleurs LQR — `lqr/lqr_*.m`
 
-```matlab
-function p = params_piscine()
-    p = params_nominal();
-    p.water_density = 998.2;  % eau douce a 20 deg C
-end
-```
+Chaque fichier definit un point d'operation et une methode de calcul de K.
+`compute_controller('nom_variante')` lit le fichier correspondant et exporte
+`controller_<variant>.mat` dans `data/generated/`.
+
+| Fichier | Methode | Description |
+|---------|---------|-------------|
+| `lqr/lqr_nominal.m` | `gain_scheduling` | **Actif** — K recalcule a chaque pas (Riccati temps reel) |
+| `lqr/lqr_nominal_fixedpoint.m` | `fixed_point` | K constant calcule au point d'operation nominal |
+
+**Ajouter une variante** — creer `lqr/lqr_<nom>.m` avec les champs `cfg.op`, `cfg.Q`,
+`cfg.R`, `cfg.method`. Elle apparait automatiquement dans `controller_selector`.
+
+La variable workspace `CONTROLLER_VARIANT` indique la variante active (ex: `'nominal'`).
+`CONTROL_METHOD_NUM` (0=gain_scheduling, 1=fixed_point) est lu par le bloc Simulink.
 
 ---
 
-## 2. Scenarios de simulation — `scenario_*.m`
+## 3. Scenarios de simulation — `scenario_*.m`
 
 Definissent les options passees a `runWorkflow` : duree, figures, exports.
-Ne touchent pas aux parametres physiques du modele.
+Ne touchent pas aux parametres physiques ni au controleur.
 
 | Fichier | Description |
 |---------|-------------|
 | `scenario_default.m` | Simulation standard — 10s, graphiques actifs, pas d'animation ni de sauvegarde |
 
-**Lancer avec un scenario** :
-
 ```matlab
-cfg = scenario_default();
-simOut = runWorkflow(cfg);
-```
-
-**Creer un scenario** — copier et modifier :
-
-```matlab
-function cfg = scenario_demo()
-    cfg = scenario_default();
-    cfg.stopTime     = 30;
-    cfg.runMouvement = true;   % animation 3D
-    cfg.saveFigures  = true;   % sauvegarde dans docs/figures/
-end
-```
-
----
-
-## Combiner les deux
-
-La calibration active est toujours celle definie dans `Parameters.m`.
-Le scenario est celui passe a `runWorkflow`.
-On peut les changer independamment :
-
-```matlab
-% Dans Parameters.m : p = params_inertie_emile();  ← calibration
-% Dans la Command Window :
 cfg = scenario_default();
 cfg.stopTime = 30;
-simOut = runWorkflow(cfg);                           % ← scenario
+simOut = runWorkflow(cfg);
 ```
-
----
-
-> **Migration future** : les `params_*.m` seront remplacees par un Simulink Data Dictionary
-> (`model/AUV_Params.sldd`), ce qui eliminera le `Parameters.m` callback et le besoin
-> d'assigner les variables manuellement au workspace.

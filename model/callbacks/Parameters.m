@@ -22,9 +22,10 @@ end
 ctrlPath = fullfile(generatedDataDir, sprintf('controller_%s.mat', variant));
 
 if exist(ctrlPath, 'file')
-    data    = load(ctrlPath, 'A_num', 'Q_final', 'method');
-    A_num   = data.A_num;
-    Q_final = data.Q_final;
+    data        = load(ctrlPath, 'A_num', 'Q_final', 'K', 'method');
+    A_num       = data.A_num;
+    Q_final     = data.Q_final;
+    K           = data.K;
     ctrl_method = data.method;
     fprintf('Parameters: controleur "%s" charge (methode : %s).\n', variant, ctrl_method);
 else
@@ -34,10 +35,15 @@ else
         variant, variant);
     load(fullfile(generatedDataDir, 'calcul_Q.mat'),          'Q_final');
     load(fullfile(generatedDataDir, 'Matrice_A_lineaire.mat'), 'A_num');
-    ctrl_method = 'gain_scheduling';  % hypothese par defaut
+    K           = zeros(8, 12);  % non utilise en gain_scheduling, mais requis par Simulink
+    ctrl_method = 'gain_scheduling';
 end
 
-assignin('base', 'Q_final',        Q_final);
-assignin('base', 'A_num',          A_num);
-assignin('base', 'Q_envoyer',      Q_final(:,:,1));
-assignin('base', 'CONTROL_METHOD', ctrl_method);
+CONTROL_METHOD_NUM = cast(strcmp(ctrl_method, 'fixed_point'), 'double');  % 0 ou 1
+
+assignin('base', 'Q_final',            Q_final);
+assignin('base', 'A_num',             A_num);
+assignin('base', 'K',                 K);
+assignin('base', 'Q_envoyer',         Q_final(:,:,1));
+assignin('base', 'CONTROL_METHOD',    ctrl_method);
+assignin('base', 'CONTROL_METHOD_NUM', CONTROL_METHOD_NUM);

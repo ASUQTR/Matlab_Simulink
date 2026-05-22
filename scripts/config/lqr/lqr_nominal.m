@@ -30,13 +30,14 @@ cfg.op.u     = 1;     cfg.op.v     = 1;     cfg.op.w     = 1;
 cfg.op.p     = 0.25;  cfg.op.q     = 0.25;  cfg.op.r     = 0.25;
 cfg.op.radius = 0.26;
 
-%% Pondération actionneurs — influence directe sur le comportement en simulation
+%% Pondération actionneurs — effort de commande (8 propulseurs)
 cfg.R = 0.1 * eye(8);
 
-%% Valeurs d'états pour la dérivation automatique de Q
-%  Méthode : Q_sym = A' * B * B' * A  (symbolique, R_design = I)
-%  puis subs(Q_sym, vars, [q_state_vals, radius]) → Q_final
-%  Ordre : [x   y   z   roll  pitch  yaw  u  v  w  p  q  r]
-cfg.q_state_vals = [0.1, 0.1, 0.1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+%% Pondération des états — Q diagonal (méthode de Bryson)
+%  Q_ii = importance relative de l'état i (plus grand = plus penalisé)
+%  Ordre : [ x    y    z    roll  pitch  yaw   u    v    w    p    q    r  ]
+%  Règle : positions > orientations > vitesses (ce qui compte visuellement)
+%  IMPORTANT : x, y, z doivent être > 0 (intégrateurs purs, lqr() l'exige)
+cfg.Q = diag([80,  80,  80,  40,   40,   40,   20,  20,  20,  20,  20,  20]);
 
 end

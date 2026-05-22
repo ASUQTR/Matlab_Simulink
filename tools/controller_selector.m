@@ -125,12 +125,22 @@ ddVariant.ValueChangedFcn = @(src, ~) updateInfo(src.Value);
                 '';
                 sprintf('R = %.2g x I_8', cfg.R(1,1));
                 '';
-                'q_state_vals :';
-                sprintf('  [%s]', num2str(cfg.q_state_vals, '%.2g '));
+                'Q diagonal :';
+                q_line(cfg);
             };
             taInfo.Value = lines;
         catch err
             taInfo.Value = {sprintf('Erreur lecture : %s', err.message)};
+        end
+    end
+
+    function s = q_line(cfg)
+        if isfield(cfg, 'Q')
+            s = sprintf('  [%s]', num2str(diag(cfg.Q)', '%.4g '));
+        elseif isfield(cfg, 'q_state_vals')
+            s = sprintf('  q_state_vals: [%s]', num2str(cfg.q_state_vals, '%.2g '));
+        else
+            s = '  (non defini)';
         end
     end
 

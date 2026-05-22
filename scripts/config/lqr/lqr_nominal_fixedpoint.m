@@ -23,17 +23,18 @@ function cfg = lqr_nominal_fixedpoint()
 cfg.method = 'fixed_point';
 
 %% Point d'opération — utilisé pour linéariser A et calculer K
-cfg.op.x     = 0;     cfg.op.y     = 0;     cfg.op.z     = 0;
-cfg.op.roll  = 0;     cfg.op.pitch = 0;     cfg.op.yaw   = 0;
-cfg.op.u     = 1;     cfg.op.v     = 1;     cfg.op.w     = 1;
-cfg.op.p     = 0.25;  cfg.op.q     = 0.25;  cfg.op.r     = 0.25;
+%  Point nominal = hovering a l'arret (toutes les vitesses a zero)
+cfg.op.x     = 0;  cfg.op.y     = 0;  cfg.op.z     = 0;
+cfg.op.roll  = 0;  cfg.op.pitch = 0;  cfg.op.yaw   = 0;
+cfg.op.u     = 0;  cfg.op.v     = 0;  cfg.op.w     = 0;
+cfg.op.p     = 0;  cfg.op.q     = 0;  cfg.op.r     = 0;
 cfg.op.radius = 0.26;
 
-%% Pondération actionneurs
+%% Pondération actionneurs — effort de commande (8 propulseurs)
 cfg.R = 0.1 * eye(8);
 
-%% Valeurs d'états pour la dérivation automatique de Q
-%  Ordre : [x   y   z   roll  pitch  yaw  u  v  w  p  q  r]
-cfg.q_state_vals = [0.1, 0.1, 0.1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+%% Pondération des états — Q diagonal (méthode de Bryson)
+%  Ordre : [ x    y    z    roll  pitch  yaw   u    v    w    p    q    r  ]
+cfg.Q = diag([80,  80,  80,  40,   40,   40,   20,  20,  20,  20,  20,  20]);
 
 end
