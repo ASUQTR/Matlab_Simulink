@@ -157,7 +157,7 @@ syms x y z roll_ pitch_ yaw_ u v w p q r du0 du1 du2 du3 du4 du5 du6 du7 radius
 %Gravity matrix parameters
 % displaced_water_volume = 0.045;
 % displaced_water_volume = 0.01; 
-displaced_water_volume = 0.03;
+displaced_water_volume = 0.024;
 water_density = 1000.0;
 gx = 0;
 gy = 0;
@@ -199,7 +199,7 @@ Yp_dot = mass_ratio*mzg;
     Kp = 0.07;
     Mq = 0.07;
     Nr = 0.07;
-    
+
     % Quadratic Damping
     Xuu = 18.18;
     Yvv = 21.66;
@@ -208,6 +208,22 @@ Yp_dot = mass_ratio*mzg;
     Mqq = 1.55;
     Nrr = 1.55;
     
+%     % Linear Damping
+%     Xu = 4.35;
+%     Yv = 8.58;
+%     Zw = 8.58; % original (-5.15)
+%     Kp = 1.5;
+%     Mq = 3;
+%     Nr = 3;
+% 
+% % Quadratic Damping
+%     Xuu = 87.07;
+%     Yvv = 171.60;
+%     Zww = 171.60;
+%     Kpp = 10;
+%     Mqq = 18.00;
+%     Nrr = 18.00;
+
 % Substitute constant parameters
 state_dot = subs(F_dot);
 G = subs(G);
