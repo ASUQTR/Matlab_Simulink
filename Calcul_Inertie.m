@@ -8,7 +8,7 @@
 
 clc;
 masse_moteur = 0.427; % masse moteur T200
-masse_total = 28
+masse_total = 24 % kg
 masse_sous_marin = masse_total-masse_moteur;
 L = 0.33;
 r = 0.11;

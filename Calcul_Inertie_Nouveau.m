@@ -5,71 +5,43 @@
 %   calcul d'inertie sous marin
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Masse moteur
+m = 0.427;   % kg
 
-% =========================================================================
-% CALCUL DES COMPOSANTES D'INERTIE PROPRE DES 8 MOTEURS
-% =========================================================================
-clear; clc;
+%% Positions moteurs
+r = [
+  0.2987  0.2130  0;
+  0.2987 -0.2130  0;
+ -0.1073  0.2725  0;
+ -0.1073 -0.2725  0;
+  0.1073  0.2725  0;
+  0.1073 -0.2725  0;
+ -0.2987  0.2130  0;
+ -0.2987 -0.2130  0
+];
 
-%% 1. PARAMÈTRES D'ENTRÉE DU ROV
-masse_total = 28;                   % [kg] Masse totale du sous-marin
-L = 0.33;                           % [m] Longueur du cylindre principal
-r = 0.11;                           % [m] Rayon du cylindre principal
-masse_un_moteur = 0.427;            % [kg] Masse d'un moteur
-I_total = [0.578, 0.645, 0.9366];   % [kg.m²] Inertie totale [Ixx, Iyy, Izz]
+%% Initialisation
+Ix = zeros(8,1);
+Iy = zeros(8,1);
+Iz = zeros(8,1);
 
-%% 2. POSITIONS DES MOTEURS
-thrust_position = [  0.2987,  0.2130, 0;   % Moteur 1
-                     0.2987, -0.2130, 0;   % Moteur 2
-                    -0.1073,  0.2725, 0;   % Moteur 3
-                    -0.1073, -0.2725, 0;   % Moteur 4
-                     0.1073,  0.2725, 0;   % Moteur 5
-                     0.1073, -0.2725, 0;   % Moteur 6
-                    -0.2987,  0.2130, 0;   % Moteur 7
-                    -0.2987, -0.2130, 0];  % Moteur 8
-
-%% 3. CALCULS PHYSIQUES
-% Masse du corps seul
-masse_cylindre = masse_total - (8 * masse_un_moteur);
-
-% Inertie du corps principal (Cylindre selon l'axe X)
-Ixx_cyl = 0.5 * masse_cylindre * r^2;
-Iyy_cyl = (1/12) * masse_cylindre * (3*r^2 + L^2);
-Izz_cyl = Iyy_cyl;
-I_cylindre = [Ixx_cyl, Iyy_cyl, Izz_cyl];
-
-% Effet de transport (Théorème de Huygens)
-I_transport_total = [0, 0, 0];
+%% Calcul inertie pour chaque moteur
 for i = 1:8
-    x = thrust_position(i, 1);
-    y = thrust_position(i, 2);
-    z = thrust_position(i, 3);
     
-    I_transport_total(1) = I_transport_total(1) + masse_un_moteur * (y^2 + z^2);
-    I_transport_total(2) = I_transport_total(2) + masse_un_moteur * (x^2 + z^2);
-    I_transport_total(3) = I_transport_total(3) + masse_un_moteur * (x^2 + y^2);
+    x = r(i,1);
+    y = r(i,2);
+    z = r(i,3);
+    
+    Ix(i) = m * (y^2 + z^2);
+    Iy(i) = m * (x^2 + z^2);
+    Iz(i) = m * (x^2 + y^2);
 end
 
-% Isolation de l'inertie propre de chaque moteur
-I_moteurs_propre_total = I_total - I_cylindre - I_transport_total;
-I_un_moteur = I_moteurs_propre_total / 8;
-
-%% 4. ATTRIBUTION DES VARIABLES SOUHAITÉES
-lx1 = I_un_moteur(1); ly1 = I_un_moteur(2); lz1 = I_un_moteur(3);
-lx2 = I_un_moteur(1); ly2 = I_un_moteur(2); lz2 = I_un_moteur(3);
-lx3 = I_un_moteur(1); ly3 = I_un_moteur(2); lz3 = I_un_moteur(3);
-lx4 = I_un_moteur(1); ly4 = I_un_moteur(2); lz4 = I_un_moteur(3);
-lx5 = I_un_moteur(1); ly5 = I_un_moteur(2); lz5 = I_un_moteur(3);
-lx6 = I_un_moteur(1); ly6 = I_un_moteur(2); lz6 = I_un_moteur(3);
-lx7 = I_un_moteur(1); ly7 = I_un_moteur(2); lz7 = I_un_moteur(3);
-lx8 = I_un_moteur(1); ly8 = I_un_moteur(2); lz8 = I_un_moteur(3);
-
-%% 5. AFFICHAGE DES VALEURS OBTENUES INLINE
-fprintf('lx1 = %.4f; ly1 = %.4f; lz1 = %.4f;\n', lx1, ly1, lz1);
-fprintf('lx2 = %.4f; ly2 = %.4f; lz2 = %.4f;\n', lx2, ly2, lz2);
-fprintf('lx3 = %.4f; ly3 = %.4f; lz3 = %.4f;\n', lx3, ly3, lz3);
-fprintf('lx4 = %.4f; ly4 = %.4f; lz4 = %.4f;\n', lx4, ly4, lz4);
-fprintf('lx5 = %.4f; ly5 = %.4f; lz5 = %.4f;\n', lx5, ly5, lz5);
-fprintf('lx6 = %.4f; ly6 = %.4f; lz6 = %.4f;\n', lx6, ly6, lz6);
-fprintf('lx7 = %.4f; ly7 = %.4f; lz7 = %.4f;\n', lx7, ly7, lz7);
-fprintf('lx8 = %.4f; ly8 = %.4f; lz8 = %.4f;\n', lx8, ly8, lz8);
+fprintf('I1x = %.6f; I1y = %.6f; I1z = %.6f;\n', Ix(1), Iy(1), Iz(1));
+fprintf('I2x = %.6f; I2y = %.6f; I2z = %.6f;\n', Ix(2), Iy(2), Iz(2));
+fprintf('I3x = %.6f; I3y = %.6f; I3z = %.6f;\n', Ix(3), Iy(3), Iz(3));
+fprintf('I4x = %.6f; I4y = %.6f; I4z = %.6f;\n', Ix(4), Iy(4), Iz(4));
+fprintf('I5x = %.6f; I5y = %.6f; I5z = %.6f;\n', Ix(5), Iy(5), Iz(5));
+fprintf('I6x = %.6f; I6y = %.6f; I6z = %.6f;\n', Ix(6), Iy(6), Iz(6));
+fprintf('I7x = %.6f; I7y = %.6f; I7z = %.6f;\n', Ix(7), Iy(7), Iz(7));
+fprintf('I8x = %.6f; I8y = %.6f; I8z = %.6f;\n', Ix(8), Iy(8), Iz(8));

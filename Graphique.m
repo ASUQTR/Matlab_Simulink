@@ -24,9 +24,9 @@ figure(1)
 hold on
 plot(x,y)
 
-carrer = 1;
+carrer = 0;
 pentagone = 0;
-ligne = 0;
+ligne = 1;
 cercle = 0;
 
 %plot(time,target(:,1))
@@ -75,8 +75,8 @@ end
 
 
 
-plot3(x, y, z)
-zlim([-1 1])
+% plot3(x, y, z)
+% zlim([-1 1])
 
 figure(2)
 hold on

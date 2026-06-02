@@ -1,79 +1,134 @@
 syms x y z roll_ pitch_ yaw_ u v w p q r radius
+
 close all
 load("ABmatrice.mat","A","B")
-radius1 = 0.26;
-% R = diag([0.1, 0.1, 0.05, 0.05, 0.05, 0.05, 0.1, 0.1]); 
-R = 0.1*eye(8);
+
+radius1 = 0.16;
+
+% R = diag([0.1, 0.1, 0.05, 0.05, 0.05, 0.05, 0.1, 0.1]);
+R = 0.1 * eye(8);
+
 % Définition des 12 pôles cibles
 P_targets = [ ...
-    -3.0 + 2i, -3.0 - 2i, ... % x, y
-    -5 + 1i, -5 - 1i,               ... % z et sa vitesse
-    -8, -9.0, ... % roll, pitch
-    -7, -6,               ... % yaw
-    -2.5, -3.0, -3.5, -4.5    ... % Amortissement des vitesses restantes
-];
+    -1.0 + 1i, -1.0 - 1i, ...
+    -5.0 + 1i, -5.0 - 1i, ...
+    -1.5, -1.0, ...
+    -7.0, -6.0, ...
+    -2.5, -3.0, -3.5, -5.0];
 
-x1 = [10]; % serve a rien
-y1 = [10]; % serve a rien
-z1 = [10]; % serve a rien
-roll_1 = [1.57];
-pitch_1 = [0.7];
-yaw_1 = [0.7];
-u1 = [1.6];
-v1 = [1.6];
-w1 = [1.6];
-p1 = [1.2];
-q1 = [1];
-r1 = [1];
+% Point d'opération
+x1 = 100;
+y1 = 100;
+z1 = 100;
 
-B_num = B;
-B_num = double(B_num);
+roll_1  = 0.1;
+pitch_1 = 0.1;
+yaw_1   = 0.1;
 
-for n = 1:1
-    
-    A_num = subs(A, [x y z roll_ pitch_ yaw_ u v w p q r radius], [x1(n) y1(n) z1(n) roll_1(n) pitch_1(n) yaw_1(n) u1(n) v1(n) w1(n) p1(n) q1(n) r1(n) radius1]);
-    A_num = double(A_num);
-    K_place = place(A_num, B_num, P_targets);
-    
-    
-    Ac = A_num - B_num * K_place;
-    Q_inverse = -(Ac' * (K_place' * R * K_place) + (K_place' * R * K_place) * Ac); 
-    
-    Q_final(:,:,n) = K_place' * R * K_place;
+u1 = 1.6;
+v1 = 1.6;
+w1 = 1.6;
 
-end
+p1 = 1.2;
+q1 = 1.0;
+r1 = 1.0;
+
+% Conversion de B en numérique
+B_num = double(B);
+
+% ==========================
+% Calcul de A et du gain K
+% ==========================
+
+A_num = subs(A,...
+    [x y z roll_ pitch_ yaw_ u v w p q r radius],...
+    [x1 y1 z1 roll_1 pitch_1 yaw_1 u1 v1 w1 p1 q1 r1 radius1]);
+
+A_num = double(A_num);
+
+K_place = place(A_num, B_num, P_targets);
+
+% ==========================
+% Système boucle fermée
+% ==========================
+
+Ac = A_num - B_num * K_place;
+
+% ==========================
+% Matrices de coût
+% ==========================
+
+Q_inverse = -(Ac' * (K_place' * R * K_place) + ...
+              (K_place' * R * K_place) * Ac);
+
+Q_final = K_place' * R * K_place;
+
+% ==========================
+% TEST 1 : Q_inverse > 0
+% ==========================
 
 if all(eig(Q_inverse) > 0)
     disp('test1 : Le système est STABLE.');
 else
-    disp("test1 : Le système est INSTABLE !");
+    disp('test1 : Le système est INSTABLE !');
 end
 
+% ==========================
+% TEST 2 : Valeurs propres
+% ==========================
 
-% Calcul de la matrice boucle fermée
-Ac = A_num - B_num * K_place;
-
-% Calcul des valeurs propres
 poles_fermes = eig(Ac);
 
-% Affichage de la partie réelle
-% disp('Partie réelle des pôles :');
-% disp(real(poles_fermes));
-
-% Test logique
 if all(real(poles_fermes) < 0)
     disp('test2 : Le système est STABLE.');
 else
     disp('test2 : Le système est INSTABLE !');
 end
 
+% ==========================
+% TEST 3 : Lyapunov complet
+% ==========================
+
+Q_lyap = eye(size(Ac));
+
+P = lyap(Ac', Q_lyap);
+
+sym_error = norm(P - P', 'fro');
+eigP = eig(P);
+
+fprintf('\n===== TEST LYAPUNOV =====\n');
+fprintf('Erreur de symétrie de P : %.3e\n', sym_error);
+fprintf('Valeur propre min(P)    : %.6e\n', min(eigP));
+fprintf('Valeur propre max(P)    : %.6e\n', max(eigP));
+
+residu = Ac' * P + P * Ac + Q_lyap;
+
+fprintf('Norme du résidu         : %.3e\n', norm(residu,'fro'));
+
+if sym_error < 1e-10 && all(eigP > 1e-10)
+    disp('test3 : Lyapunov -> SYSTEME STABLE');
+else
+    disp('test3 : Lyapunov -> SYSTEME INSTABLE');
+end
+
+% ==========================
+% Affichage des pôles
+% ==========================
+
 figure;
-pzmap(ss(Ac, B_num, eye(size(Ac)), 0)); % Trace les pôles et zéros
+pzmap(ss(Ac, B_num, eye(size(Ac)), 0));
 grid on;
 title('Placement des pôles en boucle fermée');
 
+% ==========================
+% Sauvegarde
+% ==========================
+
 save("calcul_Q","Q_final")
 
+% ==========================
+% Affichage matrices
+% ==========================
 
-disp( "Q_inverse " + "[ " + Q_inverse(1,1) + " ] " + "[ " + Q_inverse(2,2) + " ] "+ "[ " + Q_inverse(3,3) + " ] "+ "[ " + Q_inverse(4,4) + " ] "+ "[ " + Q_inverse(5,5) + " ] "+ "[ " + Q_inverse(6,6) + " ] "+ "[ " + Q_inverse(7,7) + " ] "+ "[ " + Q_inverse(8,8) + " ] "+ "[ " + Q_inverse(9,9) + " ] "+ "[ " + Q_inverse(10,10) + " ] "+ "[ " + Q_inverse(11,11) + " ] "+ "[ " + Q_inverse(12,12) + " ] ")
-disp( "Q_Final " +  "[ " + Q_final(1,1) + " ] " + "[ " + Q_final(2,2) + " ] "+ "[ " + Q_final(3,3) + " ] "+ "[ " + Q_final(4,4) + " ] "+ "[ " + Q_final(5,5) + " ] "+ "[ " + Q_final(6,6) + " ] "+ "[ " + Q_final(7,7) + " ] "+ "[ " + Q_final(8,8) + " ] "+ "[ " + Q_final(9,9) + " ] "+ "[ " + Q_final(10,10) + " ] "+ "[ " + Q_final(11,11) + " ] "+ "[ " + Q_final(12,12) + " ] ")
+disp( "Q_inverse " + "[ " + Q_inverse(1,1) + " ] " + "[ " + Q_inverse(2,2) + " ] "+ "[ " + Q_inverse(3,3) + " ] "+ "[ " + Q_inverse(4,4) + " ] "+ "[ " + Q_inverse(5,5) + " ] "+ "[ " + Q_inverse(6,6) + " ] "+ "[ " + Q_inverse(7,7) + " ] "+ "[ " + Q_inverse(8,8) + " ] "+ "[ " + Q_inverse(9,9) + " ] "+ "[ " + Q_inverse(10,10) + " ] "+ "[ " + Q_inverse(11,11) + " ] "+ "[ " + Q_inverse(12,12) + " ] ") 
+disp( "Q_Final " + "[ " + Q_final(1,1) + " ] " + "[ " + Q_final(2,2) + " ] "+ "[ " + Q_final(3,3) + " ] "+ "[ " + Q_final(4,4) + " ] "+ "[ " + Q_final(5,5) + " ] "+ "[ " + Q_final(6,6) + " ] "+ "[ " + Q_final(7,7) + " ] "+ "[ " + Q_final(8,8) + " ] "+ "[ " + Q_final(9,9) + " ] "+ "[ " + Q_final(10,10) + " ] "+ "[ " + Q_final(11,11) + " ] "+ "[ " + Q_final(12,12) + " ] ")
