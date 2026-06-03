@@ -57,14 +57,6 @@ B = -W;
 %syms angle_motors = pi/4
 % longeur[m]
 
-thrust_position = [    0.2987,  0.2130, 0;  %thruster 1
-                       0.2987, -0.2130, 0;  %thruster 2
-                      -0.1073,  0.2725, 0;  %thruster 3
-                      -0.1073, -0.2725, 0;  %thruster 4
-                       0.1073,  0.2725, 0;  %thruster 5
-                       0.1073, -0.2725, 0;  %thruster 6
-                      -0.2987,  0.2130, 0;  %thruster 7
-                      -0.2987, -0.2130, 0]; %thruster 8
 
 lx1 =  0.2987;  % original (0.2987)
 ly1 =  0.2130; % original (0.2130)
