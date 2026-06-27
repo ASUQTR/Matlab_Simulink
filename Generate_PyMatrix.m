@@ -130,7 +130,7 @@ clc
       u_control = sym(zeros(1,8));
       
       for i = 1:8
-          u_control(i) = du(i);
+          u_control(i) = du(i)*abs(du(i));
       end
       
       tau = thrust_allocation*transpose(u_control);
@@ -261,7 +261,7 @@ radius = 0.26;
 df_dstate = jacobian(state_dot,state);
 A = df_dstate;
 df_dcontrol(du0, du1, du2, du3, du4, du5, du6, du7) = jacobian(state_dot,transpose(du));
-df_dcontrol = df_dcontrol(0, 0, 0, 0, 0, 0, 0, 0);
+% df_dcontrol = df_dcontrol(0, 0, 0, 0, 0, 0, 0, 0);
 B = df_dcontrol;
 % Gravity matrix G
 
