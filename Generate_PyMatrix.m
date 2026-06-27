@@ -25,7 +25,7 @@ clc
     
     syms Xu Xuu Yv Yvv Zw Zww Kp Kpp Mq Mqq Nr Nrr % Damping matrices
     
-    syms gx gy gz bx by bz gravity radius water_density % G matrix
+    syms gx gy gz bx by bz gravity radius water_density displaced_water_volume % G matrix
     
     % Position du sous-marin
     pose = [x y z roll_ pitch_ yaw_];
@@ -102,14 +102,14 @@ clc
       
       D = sym(linear_damping + quadratic_damping);
       
-      G = sym(gravityMatrix(state, mass, gravity, radius, water_density, gravity_center, buoyancy_center));
+      G = sym(gravityMatrix(state, mass, gravity, displaced_water_volume, water_density, gravity_center, buoyancy_center));
       
       %Non-linear dynamics funciton f (state-space)
       %Page 138 of computer-aided Control System Design, Chin 2013
       
       f1 = sym(zeros(12,12));
       f1(1:6,7:12) = J(state);
-      f1(7:12,7:12) = -inv(M)*(C - D);
+      f1(7:12,7:12) = -inv(M)*(C + D);
       
       f2 = sym(zeros(12,1));
       f2(7:12,1) = -inv(M)*G;
@@ -127,10 +127,10 @@ clc
       thrust_allocation = transpose(thrust_allocation);
       
       %control input u
-      u_control = sym(zeros(1,6));
+      u_control = sym(zeros(1,8));
       
       for i = 1:8
-          u_control(i) = du(i)*abs(du(i));
+          u_control(i) = du(i);
       end
       
       tau = thrust_allocation*transpose(u_control);
@@ -152,19 +152,20 @@ clc
 %This function populates the symbolic state space model with the robot's
 %actual parameters, and generates the lqr cost matrices
 
-syms x y z roll_ pitch_ yaw_ u v w p q r du0 du1 du2 du3 du4 du5 du6 du7 radius
+syms x y z roll_ pitch_ yaw_ u v w p q r du0 du1 du2 du3 du4 du5 du6 du7 displaced_water_volume
 
 %Gravity matrix parameters
 % displaced_water_volume = 0.045;
 % displaced_water_volume = 0.01; 
-displaced_water_volume = 0.0147;
+% displaced_water_volume = 0.0147;
+displaced_water_volume = 0.024;
 water_density = 1000.0;
 gx = 0;
 gy = 0;
 gz = 0;
 bx = 0;
 by = 0;
-bz = 0;
+bz = 0.05;
 gravity = 9.81;
 
 %Mass matrix parameters
@@ -178,36 +179,61 @@ Iyz = 0;
 mzg = mass*abs(gz);
 
 % Added mass matrix parameters
+% Dimensions du sous-marin
+a = 0.30;  % demi-longueur X [m]
+b = 0.25;  % demi-largeur  Y [m]
+c = 0.17;  % demi-hauteur  Z [m]
 
-added_mass = water_density*displaced_water_volume;
-mass_ratio = added_mass/mass;
-Xu_dot = mass_ratio*mass;
-Yv_dot = mass_ratio*mass;
-Zw_dot = mass_ratio*mass;
-Kp_dot = mass_ratio*Ix;
-Mq_dot = mass_ratio*Iy;
-Nr_dot = mass_ratio*Iz;
-Xq_dot = mass_ratio*mzg;
-Yp_dot = mass_ratio*mzg;
+% Coefficients de Lamb (ellipsoïde)
+e      = sqrt(1 - (b/a)^2);
+alpha0 = (2*(1-e^2)/e^3) * (0.5*log((1+e)/(1-e)) - e);
+beta0  = (1/e^2) - (1-e^2)/(2*e^3) * log((1+e)/(1-e));
+k1     = alpha0 / (2 - alpha0);
+k2     = beta0  / (2 - beta0);
+
+% Masse ajoutée
+Xu_dot = -k1 * mass;
+Yv_dot = -k2 * mass;
+Zw_dot = -k2 * mass;
+Kp_dot = -0.0;
+Mq_dot = -(0.2 * mass * (a^2 - b^2)^2 * (k2-k1) / max((a^2-b^2), 1e-9));
+Nr_dot = -Mq_dot;
+Xq_dot = -0.0;
+Yp_dot = -0.0;
 
 % Damping matrix parameters
 
     % Linear Damping
-    Xu = 4.03;
-    Yv = 6.22;
-    Zw = 5.15; % original (-5.15)
-    Kp = 0.07;
-    Mq = 0.07;
-    Nr = 0.07;
+    % Xu = 4.03;
+    % Yv = 6.22;
+    % Zw = 5.15; % original (-5.15)
+    % Kp = 0.07;
+    % Mq = 0.07;
+    % Nr = 0.07;
+
+    Xu = -23.9201;
+    Yv = -43.6523;
+    Zw = -52.9362;
+    Kp = -5.0752;
+    Mq = -5.4659;
+    Nr = -5.3090;
+    
 
     % Quadratic Damping
-    Xuu = 18.18;
-    Yvv = 21.66;
-    Zww = 36.99;
-    Kpp = 1.55;
-    Mqq = 1.55;
-    Nrr = 1.55;
-    
+    % Xuu = 18.18;
+    % Yvv = 21.66;
+    % Zww = 36.99;
+    % Kpp = 1.55;
+    % Mqq = 1.55;
+    % Nrr = 1.55;
+
+    Xuu = -26.7035;
+    Yvv = -80.1106;
+    Zww = -117.8097;
+    Kpp = -3.1250;
+    Mqq = -5.0470;
+    Nrr = -2.9207;
+        
 %     % Linear Damping
 %     Xu = 4.35;
 %     Yv = 8.58;
@@ -235,7 +261,7 @@ radius = 0.26;
 df_dstate = jacobian(state_dot,state);
 A = df_dstate;
 df_dcontrol(du0, du1, du2, du3, du4, du5, du6, du7) = jacobian(state_dot,transpose(du));
-df_dcontrol = df_dcontrol(1, 1, 1, 1, 1, 1, 1, 1);
+df_dcontrol = df_dcontrol(0, 0, 0, 0, 0, 0, 0, 0);
 B = df_dcontrol;
 % Gravity matrix G
 
@@ -286,7 +312,7 @@ function [C] = coriolisMatrix(M,state)
 
 end
 
-function [G] = gravityMatrix(state,mass,gravity,radius,water_density,gravity_center,buoyancy_center)
+function [G, test] = gravityMatrix(state,mass,gravity,displaced_water_volume,water_density,gravity_center,buoyancy_center)
 %create the gravity matrix Page 60 of handbook of marine craft 2011
 
     [phi, theta, psi] = deal(state(4), state(5), state(6));
@@ -294,7 +320,8 @@ function [G] = gravityMatrix(state,mass,gravity,radius,water_density,gravity_cen
     %weight, W and buoyancy force, F
     W = mass*gravity; %Newton
     
-    F_buoyancy = ((4/3)*pi*radius^3)*water_density*gravity;
+    % F_buoyancy = ((4/3)*pi*radius^3)*water_density*gravity;
+    F_buoyancy = displaced_water_volume*water_density*gravity;
     
     %Gravity center position in the robot fixed frame (gx, gy, gz) [m]
     gx = gravity_center(1);
@@ -312,6 +339,7 @@ function [G] = gravityMatrix(state,mass,gravity,radius,water_density,gravity_cen
         -(gy*W - by*F_buoyancy)*cos(theta)*cos(phi) + (gz*W - bz*F_buoyancy)*cos(theta)*sin(phi);
         (gz*W - bz*F_buoyancy)*sin(theta) + (gx*W - bx*F_buoyancy)*cos(theta)*cos(phi);
         -(gx*W - bx*F_buoyancy)*cos(theta)*sin(phi) - (gy*W - by*F_buoyancy)*sin(theta)];
+    test = [W, F_buoyancy, W - F_buoyancy];
     
 end
       

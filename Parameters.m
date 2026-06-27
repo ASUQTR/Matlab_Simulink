@@ -132,5 +132,6 @@ Fx8 =  0.7071*force; Fy8 = -0.7071*force; Fz8 = 0;
 
 load("calcul_Q.mat","Q_final");
 load("Matrice_A_lineaire","A_num")
+% load("ABmatrice","A","B")
 % load("calcul_Q_possible3.mat","Q_final");
 Q_envoyer = Q_final(:,:,1);

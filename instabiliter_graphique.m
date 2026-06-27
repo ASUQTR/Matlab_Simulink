@@ -118,6 +118,6 @@ end
 % figure()
 % hold on
 % for i = 1:n
-% plot(poles_continue_reel(i,1:10), poles_continue_imaginaire(i,1:10), 'x')
+% plot(poles_continue_reel(2,1:1000), poles_continue_imaginaire(2,1:1000), 'x')
 % end
 % xline(0,'--r')

@@ -24,9 +24,9 @@ figure(1)
 hold on
 plot(x,y)
 
-carrer = 0;
+carrer = 1;
 pentagone = 0;
-ligne = 1;
+ligne = 0;
 cercle = 0;
 
 %plot(time,target(:,1))
