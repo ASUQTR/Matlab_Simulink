@@ -86,14 +86,23 @@ clc
                           -0.2987,  0.2130, 0;  %thruster 7
                           -0.2987, -0.2130, 0]; %thruster 8
      
-    thrust_direction = [     -0.707,   0.707,    0;   %thruster 1
-                             -0.707,  -0.707,    0;   %thruster 2
-                             0.0,      0.0,      -1;   %thruster 3
-                             0.0,      0.0,      -1;   %thruster 4
-                             0.0,      0.0,      -1;   %thruster 5
-                             0.0,      0.0,      -1;   %thruster 6
-                             0.707,    0.707,    0;   %thruster 7
-                             0.707,   -0.707,    0];  %thruster 8
+    % thrust_direction = [     -0.707,   0.707,    0;   %thruster 1
+    %                          -0.707,  -0.707,    0;   %thruster 2
+    %                          0.0,      0.0,      -1;   %thruster 3
+    %                          0.0,      0.0,      -1;   %thruster 4
+    %                          0.0,      0.0,      -1;   %thruster 5
+    %                          0.0,      0.0,      -1;   %thruster 6
+    %                          0.707,    0.707,    0;   %thruster 7
+    %                          0.707,   -0.707,    0];  %thruster 8
+
+    thrust_direction = [     0.707,   -0.707,    0;   %thruster 1
+                             0.707,  0.707,      0;   %thruster 2
+                             0.0,      0.0,      1;   %thruster 3
+                             0.0,      0.0,      1;   %thruster 4
+                             0.0,      0.0,      1;   %thruster 5
+                             0.0,      0.0,      1;   %thruster 6
+                             -0.707,  -0.707,    0;   %thruster 7
+                             -0.707,   0.707,    0];  %thruster 8
                        
       %% Dynamics
       M = sym(Mrb + Ma);
@@ -130,7 +139,7 @@ clc
       u_control = sym(zeros(1,8));
       
       for i = 1:8
-          u_control(i) = du(i);
+          u_control(i) = du(i);%*abs(du(i));
       end
       
       tau = thrust_allocation*transpose(u_control);
@@ -165,7 +174,7 @@ gy = 0;
 gz = 0;
 bx = 0;
 by = 0;
-bz = 0.05;
+bz = -0.05;
 gravity = 9.81;
 
 %Mass matrix parameters
@@ -214,9 +223,9 @@ Yp_dot = -0.0;
     Xu = -23.9201;
     Yv = -43.6523;
     Zw = -52.9362;
-    Kp = -5.0752;
-    Mq = -5.4659;
-    Nr = -5.3090;
+    Kp = -1.0752;
+    Mq = -1.4659;
+    Nr = -1.3090;
     
 
     % Quadratic Damping

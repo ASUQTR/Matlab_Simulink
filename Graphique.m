@@ -28,6 +28,7 @@ carrer = 1;
 pentagone = 0;
 ligne = 0;
 cercle = 0;
+cercleX = 2*sin(0:0.01:2*pi); cercleY = 2*cos(0:0.01:2*pi)-2;
 
 %plot(time,target(:,1))
 if (carrer == 1)
@@ -65,18 +66,22 @@ elseif (cercle == 1)
     plot(0,-4,'r*')
     plot(2,-2,'r*')
     plot(-2,-2,'r*')
+    plot(cercleX,cercleY)
     hold off
     title('Réponse au déplacement d un cercle en XY')
     xlabel('Position du sous-marin en X')
     ylabel('Position du sous-marin en Y')
     ylim([-4.5 0.5]);
     xlim([-2.5 2.5]);
+    
 end
 
 
 
 % plot3(x, y, z)
 % zlim([-1 1])
+% xlim([-2 2])
+% ylim([-2 2])
 
 figure(2)
 hold on
